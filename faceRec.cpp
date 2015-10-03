@@ -1,6 +1,7 @@
 #include "openbr/openbr_plugin.h"
 #include <iostream>
 #include <stdio.h>
+#include <string>
 using namespace std;
 int main(int argc, char *argv[])
 {
@@ -12,13 +13,16 @@ int main(int argc, char *argv[])
 
     // Initialize templates
     br::TemplateList target = br::TemplateList::fromGallery("testPics");
-    br::Template query("garrison0.jpg");
+    cout << "Input pic name:" << endl;
+    string pic_name;
+    cin >> pic_name;
+    br::Template query(pic_name.c_str());
     // Enroll templates
     br::Globals->enrollAll = true; // Enroll 0 or more faces per image
     target >> *transform;
     br::Globals->enrollAll = false; // Enroll exactly one face per image
     query >> *transform;
-    
+
     // Compare templates
     QList<float> scores = distance->compare(target, query);
     for(int i = 0; i < scores.size(); i++ ){
