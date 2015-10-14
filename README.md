@@ -15,6 +15,23 @@ Installation
 // TODO
 
 
-Support
+Version Control for Code Composer Studio Project
+------------------------------------------------
+The .gitignore file on this repository should do the trick, but please:
+
+DO commit and push:
+1. .ccsproject
+2. .cproject
+3. .project
+4. .settings folder
+5. makefile.defs (if using SYS/BIOS)
+
+DO NOT commit and push:
+1. Release/*
+2. config/*
+3. .launches/
+4. .xdchelp
+
+Credits to: [Texas Instruments Wiki page](http://processors.wiki.ti.com/index.php/Source_control_with_CCS)
 -------
 Please feel free to contact any of us if you have any questions or concerns.
