@@ -72,6 +72,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.MAP_FILE.13045204" name="Link information (map) listed into &lt;file&gt; (--map_file, -m)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.MAP_FILE" value="&quot;${ProjName}.map&quot;" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.LIBRARY.421028551" name="Include library file or command file as input (--library, -l)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.LIBRARY" valueType="libs">
 									<listOptionValue builtIn="false" value="&quot;libc.a&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/simplelink/ccs/OS/simplelink.a&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/oslib/ccs/free_rtos/free_rtos.a&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/driverlib/ccs/Release/driverlib.a&quot;"/>
 								</option>
@@ -90,7 +91,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="freertos_demo.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="faceRec.cpp|freertos_demo.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -101,7 +102,6 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="freertos_demo.com.ti.ccstudio.buildDefinitions.TMS470.ProjectType.59951107" name="ARM" projectType="com.ti.ccstudio.buildDefinitions.TMS470.ProjectType"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration"/>
 	<storageModule moduleId="org.eclipse.cdt.core.language.mapping">
 		<project-mappings>
 			<content-type-mapping configuration="" content-type="org.eclipse.cdt.core.asmSource" language="com.ti.ccstudio.core.TIASMLanguage"/>
@@ -111,4 +111,5 @@
 			<content-type-mapping configuration="" content-type="org.eclipse.cdt.core.cxxSource" language="com.ti.ccstudio.core.TIGPPLanguage"/>
 		</project-mappings>
 	</storageModule>
+	<storageModule moduleId="scannerConfiguration"/>
 </cproject>
