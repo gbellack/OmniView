@@ -1,0 +1,5 @@
+File,Affine_0_X,Affine_0_Y,Affine_1_X,Affine_1_Y,Confidence,FTE,FrameNumber,FrontalFace_X,FrontalFace_Y,FrontalFace_Width,FrontalFace_Height,StasmLeftEye_X,StasmLeftEye_Y,StasmRightEye_X,StasmRightEye_Y
+fourFaces.jpg,950,343,1034,327,54756,false,0,535,184,234,234,1034,327,950,343
+fourFaces.jpg,950,343,1034,327,60025,false,0,877,242,245,245,1034,327,950,343
+fourFaces.jpg,950,343,1034,327,130321,false,0,49,186,361,361,1034,327,950,343
+fourFaces.jpg,950,343,1034,327,133956,false,0,557,529,366,366,1034,327,950,343
