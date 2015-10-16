@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "osi.h"
 
@@ -15,8 +16,15 @@
 #include "prcm.h"
 #include "utils.h"
 
-#include "uart_if.h"
+#ifndef NOTERM
+	#include "uart_if.h"
+#endif
+
+// common interface includes
+#include "common.h"
 #include "pinmux.h"
+
+#include "wireless.h"
 
 //*****************************************************************************
 //                      MACRO DEFINITIONS
@@ -39,16 +47,19 @@
 #define DISPLAY_TASK_PRIORITY 1
 
 // WIRELESS
-#define WIRELESS_TASK_STACK_SIZE 2048
-#define WIRELESS_TASK_NAME "Wireless Task"
-#define WIRELESS_TASK_PRIORITY 1
+#define WIRELESS_AP_TASK_STACK_SIZE 2048
+#define WIRELESS_AP_TASK_NAME "Wireless Task"
+#define WIRELESS_AP_TASK_PRIORITY 2
+
+// MCU
+#define MCU_TASK_STACK_SIZE
 
 //*****************************************************************************
 //                      PROTOTYPES
 //*****************************************************************************
 static void initializeBoard();
-static void cameraTask( void *pvParameters );
-static void displayTask( void *pvParameters );
+static void cameraTask(void *pvParameters);
+static void displayTask(void *pvParameters);
 
 //*****************************************************************************
 //                 GLOBAL VARIABLES -- Start
@@ -75,23 +86,17 @@ OsiMsgQ_t MsgQ;
 //*****************************************************************************
 #ifdef USE_FREERTOS
 
-	//*****************************************************************************
-	//
 	//! \brief Application defined hook (or callback) function - assert
 	//!
 	//! \param[in]  pcFile - Pointer to the File Name
 	//! \param[in]  ulLine - Line Number
-	//!
-	//! \return none
-	//!
-	//*****************************************************************************
 	void vAssertCalled( const char *pcFile, unsigned long ulLine )
 	{
 		//Handle Assert here
 		while(1);
 	}
 
-	void vApplicationIdleHook( void)
+	void vApplicationIdleHook()
 	{
 		//Handle Idle Hook for Profiling, Power Management etc
 	}
@@ -112,7 +117,7 @@ OsiMsgQ_t MsgQ;
 #endif //USE_FREERTOS
 
 // EFFECTS: Initializes the board.
-static void initializeBoard(void)
+static void initializeBoard()
 {
 	/* In case of TI-RTOS vector table is initialize by OS itself */
 	#ifndef USE_TIRTOS
@@ -129,9 +134,7 @@ static void initializeBoard(void)
 
 	#endif
 
-	//
 	// Enable Processor
-	//
 	MAP_IntMasterEnable();
 	MAP_IntEnable(FAULT_SYSTICK);
 
@@ -139,7 +142,7 @@ static void initializeBoard(void)
 }
 
 // EFECTS: Prints out the displayed content on the screen.
-void displayTask( void *pvParameters )
+void displayTask(void *pvParameters)
 {
    unsigned long ul_2;
    const char *pcInterruptMessage[4] = {"Welcome","to","CC32xx","development !\n"};
@@ -156,7 +159,7 @@ void displayTask( void *pvParameters )
 }
 
 // EFFECTS: Takes a picture.
-void cameraTask( void *pvParameters )
+void cameraTask(void *pvParameters)
 {
 	char pcMessage[MAX_MSG_LENGTH];
 	for( ;; )
@@ -177,19 +180,15 @@ int main( void )
 
     PinMuxConfig();
 
-    //
-    // Initializing the terminal
-    //
-    InitTerm();
+	#ifndef NOTERM
+		// Configuring UART
+		InitTerm();
+	#endif
 
-    //
     // Clearing the terminal
-    //
     ClearTerm();
 
-    //
     // Creating a queue for 10 elements.
-    //
     OsiReturnVal_e osi_retVal;
     osi_retVal = osi_MsgQCreate(&MsgQ, "MSGQ", MAX_MSG_LENGTH, 10);
     if(osi_retVal != OSI_OK)
@@ -198,13 +197,34 @@ int main( void )
     	while(1);
     }
 
-    // Create the Queue Receive task
-    osi_TaskCreate(displayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
-    				NULL, CAMERA_TASK_PRIORITY, NULL);
+	//////////////////////////////////////////////
+	long lRetVal = -1;
 
-    // Create the Queue Send task
-    osi_TaskCreate(cameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
-    				NULL, CAMERA_TASK_PRIORITY, NULL );
+	// Start the SimpleLink Host
+	lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
+	if(lRetVal < 0)
+	{
+		ERR_PRINT(lRetVal);
+		LOOP_FOREVER();
+	}
+
+	// Create the Queue Display task
+	osi_TaskCreate(displayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
+					NULL, CAMERA_TASK_PRIORITY, NULL);
+
+	// Create the Queue Camera task
+	osi_TaskCreate(cameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
+					NULL, CAMERA_TASK_PRIORITY, NULL);
+
+    // Create the Queue Wireless task
+    lRetVal = osi_TaskCreate(wlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
+			NULL, WIRELESS_AP_TASK_PRIORITY, NULL);
+
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
 
     // Start the task scheduler
     osi_start();
