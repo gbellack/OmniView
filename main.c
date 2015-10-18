@@ -20,11 +20,14 @@
 	#include "uart_if.h"
 #endif
 
-// common interface includes
 #include "common.h"
 #include "pinmux.h"
 
-#include "wireless.h"
+#include "modules/wireless/wireless.h"
+#include "modules/display/display.h"
+#include "modules/microphone/microphone.h"
+#include "modules/mcu/mcu.h"
+#include "modules/camera/camera.h"
 
 //*****************************************************************************
 //                      MACRO DEFINITIONS
@@ -52,18 +55,17 @@
 #define WIRELESS_AP_TASK_PRIORITY 2
 
 // MCU
-#define MCU_TASK_STACK_SIZE
+#define MCU_TASK_STACK_SIZE 2048
+#define MCU_TASK_NAME "MCU Task"
+#define MCU_TASK_PRIORITY 1
 
-//*****************************************************************************
-//                      PROTOTYPES
-//*****************************************************************************
-static void initializeBoard();
-static void cameraTask(void *pvParameters);
-static void displayTask(void *pvParameters);
+// MICROPHONE
+#define MICROPHONE_TASK_STACK_SIZE 2048
+#define MICROPHONE_TASK_NAME "Microphone Task"
+#define MICROPHONE_TASK_PRIORITY 1
 
-//*****************************************************************************
-//                 GLOBAL VARIABLES -- Start
-//*****************************************************************************
+static void InitializeBoard();
+
 // The queue used to send strings to the task1.
 OsiMsgQ_t MsgQ;
 
@@ -77,9 +79,6 @@ OsiMsgQ_t MsgQ;
 		extern uVectorEntry __vector_table;
 	#endif
 #endif
-//*****************************************************************************
-//                 GLOBAL VARIABLES -- End
-//*****************************************************************************
 
 //*****************************************************************************
 // FreeRTOS User Hook Functions enabled in FreeRTOSConfig.h
@@ -117,7 +116,7 @@ OsiMsgQ_t MsgQ;
 #endif //USE_FREERTOS
 
 // EFFECTS: Initializes the board.
-static void initializeBoard()
+static void InitializeBoard()
 {
 	/* In case of TI-RTOS vector table is initialize by OS itself */
 	#ifndef USE_TIRTOS
@@ -141,42 +140,9 @@ static void initializeBoard()
 	PRCMCC3200MCUInit();
 }
 
-// EFECTS: Prints out the displayed content on the screen.
-void displayTask(void *pvParameters)
-{
-   unsigned long ul_2;
-   const char *pcInterruptMessage[4] = {"Welcome","to","CC32xx","development !\n"};
-
-   ul_2 =0;
-
-   for( ;; )
-   {
-		/* Queue a message for the print task to display on the UART CONSOLE. */
-		osi_MsgQWrite(&MsgQ, (void*) pcInterruptMessage[ul_2 % 4], OSI_NO_WAIT);
-		ul_2++;
-		osi_Sleep(200);
-   }
-}
-
-// EFFECTS: Takes a picture.
-void cameraTask(void *pvParameters)
-{
-	char pcMessage[MAX_MSG_LENGTH];
-	for( ;; )
-	{
-		/* Wait for a message to arrive. */
-		osi_MsgQRead(&MsgQ, pcMessage, OSI_WAIT_FOREVER);
-
-		UART_PRINT("message = ");
-		UART_PRINT(pcMessage);
-		UART_PRINT("\n\r");
-		osi_Sleep(200);
-	}
-}
-
 int main( void )
 {
-    initializeBoard();
+    InitializeBoard();
 
     PinMuxConfig();
 
@@ -197,7 +163,6 @@ int main( void )
     	while(1);
     }
 
-	//////////////////////////////////////////////
 	long lRetVal = -1;
 
 	// Start the SimpleLink Host
@@ -209,15 +174,15 @@ int main( void )
 	}
 
 	// Create the Queue Display task
-	osi_TaskCreate(displayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
+	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
 					NULL, CAMERA_TASK_PRIORITY, NULL);
 
 	// Create the Queue Camera task
-	osi_TaskCreate(cameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
+	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
 					NULL, CAMERA_TASK_PRIORITY, NULL);
 
     // Create the Queue Wireless task
-    lRetVal = osi_TaskCreate(wlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
+    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
 			NULL, WIRELESS_AP_TASK_PRIORITY, NULL);
 
     if(lRetVal < 0)
