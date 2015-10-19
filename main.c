@@ -10,10 +10,10 @@
 #include "hw_types.h"
 #include "hw_ints.h"
 #include "interrupt.h"
+#include "prcm.h"
 #include "rom.h"
 #include "rom_map.h"
 #include "uart.h"
-#include "prcm.h"
 #include "utils.h"
 
 #ifndef NOTERM
@@ -23,16 +23,15 @@
 #include "common.h"
 #include "pinmux.h"
 
-#include "modules/wireless/wireless.h"
-#include "modules/display/display.h"
-#include "modules/microphone/microphone.h"
-#include "modules/mcu/mcu.h"
 #include "modules/camera/camera.h"
+#include "modules/display/display.h"
+#include "modules/mcu/mcu.h"
+#include "modules/microphone/microphone.h"
+#include "modules/wireless/wireless.h"
 
 //*****************************************************************************
 //                      MACRO DEFINITIONS
 //*****************************************************************************
-#define APPLICATION_VERSION     "1.1.1"
 #define UART_PRINT              Report
 #define SPAWN_TASK_PRIORITY     9
 #define OSI_STACK_SIZE          2048
@@ -144,14 +143,13 @@ int main( void )
 {
     InitializeBoard();
 
+    // Configure pins.
     PinMuxConfig();
 
 	#ifndef NOTERM
-		// Configuring UART
 		InitTerm();
 	#endif
 
-    // Clearing the terminal
     ClearTerm();
 
     // Creating a queue for 10 elements.

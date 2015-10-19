@@ -4,6 +4,7 @@
 
 #include "simplelink.h"
 
+// Access Point name and password settings
 #define AP_SSID_NAME "OmniView"
 #define AP_SSID_PASSWORD "OmniView"
 

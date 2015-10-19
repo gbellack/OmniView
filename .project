@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>gpio_if.c</name>
+			<type>1</type>
+			<locationURI>CC3200_SDK_ROOT/example/common/gpio_if.c</locationURI>
+		</link>
+		<link>
 			<name>startup_ccs.c</name>
 			<type>1</type>
 			<locationURI>CC3200_SDK_ROOT/example/common/startup_ccs.c</locationURI>
@@ -34,6 +39,11 @@
 			<name>uart_if.c</name>
 			<type>1</type>
 			<locationURI>CC3200_SDK_ROOT/example/common/uart_if.c</locationURI>
+		</link>
+		<link>
+			<name>udma_if.c</name>
+			<type>1</type>
+			<locationURI>CC3200_SDK_ROOT/example/common/udma_if.c</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>

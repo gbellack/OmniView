@@ -409,9 +409,9 @@ static long ConfigureSimpleLinkToDefaultState()
 //! \return sl_start return value(int).
 //
 //****************************************************************************
-static int ConfigureMode(int iMode)
+static int ConfigureMode()
 {
-    long   lRetVal = -1;
+    long lRetVal = -1;
 
     UART_PRINT("Connecting to %s...\n\r", AP_SSID_NAME);
 
@@ -456,7 +456,7 @@ static int PingTest(unsigned long ulIpAddr)
     PingParams.PingRequestTimeout = PING_TIMEOUT;
     PingParams.TotalNumberOfAttempts = NO_OF_ATTEMPTS;
     PingParams.Flags = PING_FLAG;
-    PingParams.Ip = ulIpAddr; /* Cleint's ip address */
+    PingParams.Ip = ulIpAddr; /* Client's ip address */
 
     UART_PRINT("Running Ping Test...\n\r");
     /* Check for LAN connection */
@@ -528,7 +528,7 @@ void WlanAPModeTask( void *pvParameters )
     // Configure the networking mode and ssid name(for AP mode)
     if(lRetVal != ROLE_AP)
     {
-        if(ConfigureMode(lRetVal) != ROLE_AP)
+        if(ConfigureMode() != ROLE_AP)
         {
             UART_PRINT("Unable to set AP mode, exiting Application...\n\r");
             sl_Stop(SL_STOP_TIMEOUT);
