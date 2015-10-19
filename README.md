@@ -12,8 +12,12 @@
 5. Here comes the fun part. Please install GitHub for Windows. You will need this to pull the CCS project from this repository.  
 // TODO
 
-You should be able to build and run the proejct once all these are set up. If you would like to flash the program onto the Launchpad, you will need a seaparate program called Uniflash by Texas Instruments. Go ahead and download it from here and continue to follow the steps below. If you would not like to do so, you may skip them.
+You should be able to build and run the project once all these are set up. 
 
+###Flashing the program via UniFlash
+
+If you would like to flash the program onto the Launchpad, you will need a seaparate program called Uniflash by Texas Instruments. Go ahead and download it from here and continue to follow the steps below. If you would not like to do so, you may skip them.
+Credits to: [Texas Instruments Uniflash Wiki page](http://processors.wiki.ti.com/index.php/UniFlash_Quick_Start_Guide)
 
 ###Version Control for Code Composer Studio Project
 The .gitignore file on this repository should do the trick, but please:  
