@@ -130,7 +130,6 @@ void Adafruit_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color) {
       case BLACK:   buffer[x+ (y/8)*SSD1306_LCDWIDTH] &= ~(1 << (y&7)); break; 
       case INVERSE: buffer[x+ (y/8)*SSD1306_LCDWIDTH] ^=  (1 << (y&7)); break; 
     }
-    
 }
 
 Adafruit_SSD1306::Adafruit_SSD1306(int8_t SID, int8_t SCLK, int8_t DC, int8_t RST, int8_t CS) : Adafruit_GFX(SSD1306_LCDWIDTH, SSD1306_LCDHEIGHT) {
@@ -166,23 +165,23 @@ void Adafruit_SSD1306::begin(uint8_t vccstate, uint8_t i2caddr, bool reset) {
   if (sid != -1){
     pinMode(dc, OUTPUT);
     pinMode(cs, OUTPUT);
-#ifdef PortReg
-    csport      = portOutputRegister(digitalPinToPort(cs));
-    cspinmask   = digitalPinToBitMask(cs);
-    dcport      = portOutputRegister(digitalPinToPort(dc));
-    dcpinmask   = digitalPinToBitMask(dc);
-#endif
-    if (!hwSPI){
+    #ifdef PortReg
+        csport      = portOutputRegister(digitalPinToPort(cs));
+        cspinmask   = digitalPinToBitMask(cs);
+        dcport      = portOutputRegister(digitalPinToPort(dc));
+        dcpinmask   = digitalPinToBitMask(dc);
+    #endif
+    if (!hwSPI) {
       // set pins for software-SPI
       pinMode(sid, OUTPUT);
       pinMode(sclk, OUTPUT);
-#ifdef PortReg
-      clkport     = portOutputRegister(digitalPinToPort(sclk));
-      clkpinmask  = digitalPinToBitMask(sclk);
-      mosiport    = portOutputRegister(digitalPinToPort(sid));
-      mosipinmask = digitalPinToBitMask(sid);
-#endif
-      }
+      #ifdef PortReg
+            clkport     = portOutputRegister(digitalPinToPort(sclk));
+            clkpinmask  = digitalPinToBitMask(sclk);
+            mosiport    = portOutputRegister(digitalPinToPort(sid));
+            mosipinmask = digitalPinToBitMask(sid);
+      #endif
+    }
     if (hwSPI){
       SPI.begin();
 #ifdef SPI_HAS_TRANSACTION

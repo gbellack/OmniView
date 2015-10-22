@@ -18,7 +18,6 @@
 
 // common interface includes
 #include "common.h"
-#include "../../pinmux.h"
 
 #ifndef NOTERM
 	#include "uart_if.h"
