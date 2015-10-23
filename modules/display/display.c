@@ -27,7 +27,7 @@
 
 void DisplayTask(void *pvParameters) {
 
-//    InitializeDisplay();
+    InitializeDisplay();
 
 	for (;;) {
 //		ClearDisplay();

@@ -25,6 +25,7 @@
 
 #include "modules/camera/camera.h"
 #include "modules/display/display.h"
+#include "modules/display/display_driver.h"
 #include "modules/mcu/mcu.h"
 #include "modules/microphone/microphone.h"
 #include "modules/wireless/wireless.h"
@@ -179,9 +180,9 @@ int main( void )
 	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
 					NULL, CAMERA_TASK_PRIORITY, NULL);
 
-    // Create the Queue Wireless task
-    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
-			NULL, WIRELESS_AP_TASK_PRIORITY, NULL);
+//    // Create the Queue Wireless task
+//    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
+//			NULL, WIRELESS_AP_TASK_PRIORITY, NULL);
 
     if(lRetVal < 0)
     {

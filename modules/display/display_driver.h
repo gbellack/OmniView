@@ -1,17 +1,19 @@
+/* This file will contain the drivers for the 128x64 monochrome display. */
+
 #ifndef DISPLAY_DRIVER_H
 #define DISPLAY_DRIVER_H
 
 #include <stdint.h>
 
-/* This file will contain the drivers for the 128x64 monochrome display. */
+#define SSD1306_I2C_ADDRESS   0x3C	// 011110+SA0+RW, SA0 is grounded.
 
-#define BLACK 0
-#define WHITE 1
-#define INVERSE 2
+/* PIN LAYOUT CONFIGURATIONS */
 
-#define SSD1306_I2C_ADDRESS   0x3C	// 011110+SA0+RW - 0x3C or 0x3D
-// Address for 128x32 is 0x3C
-// Address for 128x64 is 0x3D (default) or 0x3C (if SA0 is grounded)
+#define DISPLAY_RESET_PIN 	PIN_17 /* Pin 10 for camera reset */
+#define DISPLAY_SCL_PIN 	PIN_01 /* Pin 1 for I2C scl */
+#define DISPLAY_SDA_PIN 	PIN_02 /* Pin 2 for I2c sda */
+
+/* OLED CONFIGURATIONS */
 
 #define SSD1306_LCDWIDTH                  	128	/* Display width */
 #define SSD1306_LCDHEIGHT                 	64	/* Display height */
@@ -61,6 +63,10 @@
 #define SSD1306_VERTICAL_AND_RIGHT_HORIZONTAL_SCROLL 	0x29
 #define SSD1306_VERTICAL_AND_LEFT_HORIZONTAL_SCROLL 	0x2A
 
+#define BLACK 0
+#define WHITE 1
+#define INVERSE 2
+
 /* Swaps the two values */
 #define ssd1306_swap(a, b) { int16_t t = a; a = b; b = t; }
 
@@ -73,10 +79,9 @@ extern void InitializeDisplay();
 extern void Send(uint8_t payload);
 
 /*
- *
  * Display
+ *
  */
-
 
 /* EFFECTS: Clears the display. */
 extern void ClearDisplay();
@@ -97,8 +102,8 @@ extern void DisplayOn();
 extern void DisplayOff();
 
 /*
- *
  * Scrolling
+ *
  */
 
 /* EFFECTS: Sets the scroll direction */
@@ -109,7 +114,6 @@ extern void StartScrollLeft(uint8_t start, uint8_t stop);
 extern void StopScroll();
 
 /*
- *
  * DRAWING
  *
  */
