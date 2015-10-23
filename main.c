@@ -176,9 +176,9 @@ int main( void )
 	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
 					NULL, CAMERA_TASK_PRIORITY, NULL);
 
-	// Create the Queue Camera task
-	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
-					NULL, CAMERA_TASK_PRIORITY, NULL);
+//	// Create the Queue Camera task
+//	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
+//					NULL, CAMERA_TASK_PRIORITY, NULL);
 
 //    // Create the Queue Wireless task
 //    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,

@@ -128,67 +128,65 @@ void InitializeDisplay() {
 	#endif
 
 	// Init sequence for 128x64 OLED module
-//	Send(SSD1306_DISPLAYOFF);                    // 0xAE
-//	Send(SSD1306_SETDISPLAYCLOCKDIV);            // 0xD5
-//	Send(0x80);                                  // the suggested ratio 0x80
-//	Send(SSD1306_SETMULTIPLEX);                  // 0xA8
-//	Send(0x3F);
-//	Send(SSD1306_SETDISPLAYOFFSET);              // 0xD3
-//	Send(0x0);                                   // no offset
-//	Send(SSD1306_SETSTARTLINE | 0x0);            // line #0
-//	Send(SSD1306_CHARGEPUMP);                    // 0x8D
-//
-//	// TODO - Not sure what this does...
-////    if (vccstate == SSD1306_EXTERNALVCC) {
-////    	Send(0x10);
-////    }
-////    else
-////    {
-////    	Send(0x14);
-////    }
-//
-//    Send(SSD1306_MEMORYMODE);                    // 0x20
-//    Send(0x00);                                  // 0x0 act like ks0108
-//    Send(SSD1306_SEGREMAP | 0x1);
-//    Send(SSD1306_COMSCANDEC);
-//    Send(SSD1306_SETCOMPINS);                    // 0xDA
-//    Send(0x12);
-//    Send(SSD1306_SETCONTRAST);                   // 0x81
-//
-////    if (vccstate == SSD1306_EXTERNALVCC)
-////    {
-////    	Send(0x9F);
-////    }
-////    else
-////    {
-////    	Send(0xCF);
-////    }
-//
-//    Send(SSD1306_SETPRECHARGE);                  // 0xd9
-//
-////    if (vccstate == SSD1306_EXTERNALVCC)
-////    {
-////    	Send(0x22);
-////    }
-////    else
-////    {
-////    	Send(0xF1);
-////    }
-//
-//    Send(SSD1306_SETVCOMDETECT);                 // 0xDB
-//    Send(0x40);
-//    Send(SSD1306_DISPLAYALLON_RESUME);           // 0xA4
-//    Send(SSD1306_NORMALDISPLAY);                 // 0xA6
+	Send(SSD1306_DISPLAYOFF);                    // 0xAE
+	Send(SSD1306_SETDISPLAYCLOCKDIV);            // 0xD5
+	Send(0x8000);                                  // the suggested ratio 0x80
+	Send(SSD1306_SETMULTIPLEX);                  // 0xA8
+	Send(0x3F00);
+	Send(SSD1306_SETDISPLAYOFFSET);              // 0xD3
+	Send(0x0000);                                   // no offset
+	Send(SSD1306_SETSTARTLINE | 0x0);            // line #0
+	Send(SSD1306_CHARGEPUMP);                    // 0x8D
+
+	// TODO - Not sure what this does...
+//    if (vccstate == SSD1306_EXTERNALVCC) {
+//    	Send(0x1000);
+//    }
+//    else
+    {
+    	Send(0x1400);
+    }
+
+    Send(SSD1306_MEMORYMODE);                    // 0x20
+    Send(0x0000);                                  // 0x0 act like ks0108
+    Send(SSD1306_SEGREMAP | 0x1);
+    Send(SSD1306_COMSCANDEC);
+    Send(SSD1306_SETCOMPINS);                    // 0xDA
+    Send(0x1200);
+    Send(SSD1306_SETCONTRAST);                   // 0x81
+
+//    if (vccstate == SSD1306_EXTERNALVCC)
+//    {
+//    	Send(0x9F00);
+//    }
+//    else
+    {
+    	Send(0xCF00);
+    }
+
+    Send(SSD1306_SETPRECHARGE);                  // 0xd9
+
+//    if (vccstate == SSD1306_EXTERNALVCC)
+//    {
+//    	Send(0x2200);
+//    }
+//    else
+    {
+    	Send(0xF100);
+    }
+
+    Send(SSD1306_SETVCOMDETECT);                 // 0xDB
+    Send(0x4000);
+    Send(SSD1306_DISPLAYALLON_RESUME);           // 0xA4
+    Send(SSD1306_NORMALDISPLAY);                 // 0xA6
 
     DisplayOn();
 }
 
 /* EFFECTS: Send and receive the payload */
-void Send(uint8_t payload) {
+void Send(uint16_t payload) {
 
-	unsigned char temp = 0x00;
-	I2C_IF_Write(SSD1306_I2C_ADDRESS, &temp, 1, 1); // Co = 0, D/C = 0
-	I2C_IF_Write(SSD1306_I2C_ADDRESS, (unsigned char *)payload, 1, 1);
+	I2C_IF_Write(SSD1306_I2C_ADDRESS, &payload, 2, 1);
 }
 
 /* EFFECTS: Clears the display. */
