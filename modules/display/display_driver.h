@@ -1,4 +1,6 @@
-/* This file will contain the drivers for the 128x64 monochrome display. */
+/* This file will contain the drivers for the 128x64 monochrome display.
+ * WARNING: Only works on little endian systems!
+ */
 
 #ifndef DISPLAY_DRIVER_H
 #define DISPLAY_DRIVER_H
@@ -9,9 +11,9 @@
 
 /* PIN LAYOUT CONFIGURATIONS */
 
-#define DISPLAY_RESET_PIN 	PIN_17 /* Pin 10 for camera reset */
-#define DISPLAY_SCL_PIN 	PIN_01 /* Pin 1 for I2C scl */
-#define DISPLAY_SDA_PIN 	PIN_02 /* Pin 2 for I2c sda */
+#define DISPLAY_RESET_PIN 	PIN_17 /* Pin 10 for display reset */
+#define DISPLAY_SCL_PIN 	PIN_01 /* Pin 1 for display I2C scl */
+#define DISPLAY_SDA_PIN 	PIN_02 /* Pin 2 for display I2c sda */
 
 /* OLED CONFIGURATIONS */
 
@@ -48,12 +50,12 @@
 #define SSD1306_COMSCANINC 					0xC000
 #define SSD1306_COMSCANDEC 					0xC800
 
-#define SSD1306_SEGREMAP 					0xA000
+#define SSD1306_SEGREMAP 					0xA100
 
 #define SSD1306_CHARGEPUMP 					0x8D00
 
-#define SSD1306_EXTERNALVCC 				0x1
-#define SSD1306_SWITCHCAPVCC 				0x2
+#define SSD1306_EXTERNALVCC 				0x0100
+#define SSD1306_SWITCHCAPVCC 				0x0200
 
 #define SSD1306_ACTIVATE_SCROLL 						0x2F00
 #define SSD1306_DEACTIVATE_SCROLL 						0x2E00

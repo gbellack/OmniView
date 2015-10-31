@@ -28,9 +28,27 @@
 void DisplayTask(void *pvParameters) {
 
     InitializeDisplay();
+	ClearDisplay();
+	Display();
 
+//	// Show image buffer on the display hardware.
+//	// Since the buffer is intialized with an Adafruit splashscreen
+//	// internally, this will display the splashscreen.
+//	display.display();
+//	delay(2000);
+//
+//	// Clear the buffer.
+//	display.clearDisplay();
+//
+//	// draw a single pixel
+//	display.drawPixel(10, 10, WHITE);
+//	// Show the display buffer on the hardware.
+//	// NOTE: You _must_ call display after making any drawing commands
+//	// to make them visible on the display hardware!
+//	display.display();
+//	delay(2000);
+//	display.clearDisplay();
 	for (;;) {
-//		ClearDisplay();
-//		Display();
+
 	}
 }

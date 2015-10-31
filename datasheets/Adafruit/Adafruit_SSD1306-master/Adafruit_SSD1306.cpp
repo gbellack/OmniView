@@ -171,10 +171,12 @@ void Adafruit_SSD1306::begin(uint8_t vccstate, uint8_t i2caddr, bool reset) {
         dcport      = portOutputRegister(digitalPinToPort(dc));
         dcpinmask   = digitalPinToBitMask(dc);
     #endif
+
     if (!hwSPI) {
       // set pins for software-SPI
       pinMode(sid, OUTPUT);
       pinMode(sclk, OUTPUT);
+      
       #ifdef PortReg
             clkport     = portOutputRegister(digitalPinToPort(sclk));
             clkpinmask  = digitalPinToBitMask(sclk);
@@ -182,24 +184,25 @@ void Adafruit_SSD1306::begin(uint8_t vccstate, uint8_t i2caddr, bool reset) {
             mosipinmask = digitalPinToBitMask(sid);
       #endif
     }
-    if (hwSPI){
+
+    if (hwSPI) {
       SPI.begin();
-#ifdef SPI_HAS_TRANSACTION
-      SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-#else
-      SPI.setClockDivider (4);
-#endif
+      #ifdef SPI_HAS_TRANSACTION
+            SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      #else
+            SPI.setClockDivider (4);
+      #endif
     }
   }
   else
   {
     // I2C Init
     Wire.begin();
-#ifdef __SAM3X8E__
-    // Force 400 KHz I2C, rawr! (Uses pins 20, 21 for SDA, SCL)
-    TWI1->TWI_CWGR = 0;
-    TWI1->TWI_CWGR = ((VARIANT_MCK / (2 * 400000)) - 4) * 0x101;
-#endif
+    #ifdef __SAM3X8E__
+        // Force 400 KHz I2C, rawr! (Uses pins 20, 21 for SDA, SCL)
+        TWI1->TWI_CWGR = 0;
+        TWI1->TWI_CWGR = ((VARIANT_MCK / (2 * 400000)) - 4) * 0x101;
+    #endif
   }
   if ((reset) && (rst >= 0)) {
     // Setup reset pin direction (used by both SPI and I2C)  
