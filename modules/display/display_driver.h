@@ -57,6 +57,7 @@
 #define SSD1306_EXTERNALVCC 				0x0100
 #define SSD1306_SWITCHCAPVCC 				0x0200
 
+/* SCROLLING DEFINES */
 #define SSD1306_ACTIVATE_SCROLL 						0x2F00
 #define SSD1306_DEACTIVATE_SCROLL 						0x2E00
 #define SSD1306_SET_VERTICAL_SCROLL_AREA				0xA300
@@ -70,7 +71,7 @@
 #define INVERSE 2
 
 /* Swaps the two values */
-#define ssd1306_swap(a, b) { int16_t t = a; a = b; b = t; }
+#define swap(a, b) { int16_t t = a; a = b; b = t; }
 
 /* REQUIRES: The reset pin.
  * EFFECTS: Initializes the display pins.
@@ -90,9 +91,6 @@ extern void ClearDisplay();
 
 /* EFFECTS: Displays whatever that is stored in buffer */
 extern void Display();
-
-/* EFFECTS: Inverts the display. */
-extern void InvertDisplay();
 
 /* EFFECTS: Dims the display */
 extern void Dim(int dim);
