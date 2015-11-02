@@ -28,7 +28,7 @@
 #endif
 #include "i2c_if.h"
 
-#define UART_PRINT	Report
+#define UART_PRINT Report
 
 /* Buffer that stores the image. */
 static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8] = {
@@ -224,7 +224,6 @@ void Display() {
 	Send(0x0700); // Page end address
 
 	uint16_t i = 0;
-
 	for (i = 0; i < 64; ++i) {
 		// send a bunch of data in one xmission
 
@@ -232,7 +231,16 @@ void Display() {
 							0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 		I2C_IF_Write(SSD1306_I2C_ADDRESS, temp, 17, 1);
 	}
-    MAP_UtilsDelay(10000);
+
+//	uint8_t tempBuffer[17] = {0x40, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+//							0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+//	for (i = 0; i < SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8; ++i) {
+//
+//		// Copy all over to the buffer.
+//		memcpy(tempBuffer + 1, buffer + i, 16);
+//		I2C_IF_Write(SSD1306_I2C_ADDRESS, tempBuffer, 17, 1);
+//		i+=15;
+//	}
 }
 
 void InvertDisplay() {
