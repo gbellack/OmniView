@@ -35,9 +35,6 @@
 //*****************************************************************************
 #define UART_PRINT              Report
 #define SPAWN_TASK_PRIORITY     9
-#define OSI_STACK_SIZE          2048
-#define APP_NAME                "OmniView"
-#define MAX_MSG_LENGTH			16
 
 // CAMERA
 #define CAMERA_TASK_STACK_SIZE 2048
@@ -81,8 +78,8 @@
 #define STATUS_TASK_NAME "Status Check Task"
 #define STATUS_TASK_PRIORITY 10
 
+/* Prototypes */
 void TimerPeriodicIntHandler();
-
 static void InitializeBoard();
 
 // The queue used to send strings to the task1.
@@ -178,9 +175,10 @@ int main( void )
 //	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
 //					NULL, CAMERA_TASK_PRIORITY, NULL);
 
-//    // Create the Queue Wireless task
-//    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
-//			NULL, WIRELESS_AP_TASK_PRIORITY, NULL);
+    // Create the Queue Wireless task
+    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME,
+								WIRELESS_AP_TASK_STACK_SIZE, NULL,
+								WIRELESS_AP_TASK_PRIORITY, NULL);
 
 //    if(lRetVal < 0)
 //    {
