@@ -55,89 +55,88 @@
 #define WIRELESS_AP_TASK_PRIORITY 2
 
 // MCU
-#define MCU_TASK_STACK_SIZE 2048
-#define MCU_TASK_NAME "MCU Task"
-#define MCU_TASK_PRIORITY 1
+#define MCU_ENTER_DEEPSLEEP_TASK_STACK_SIZE 2048
+#define MCU_ENTER_DEEPSLEEP_TASK_NAME "Enter Deepsleep Task"
+#define MCU_ENTER_DEEPSLEEP_TASK_PRIORITY 1
+
+#define MCU_EXIT_DEEPSLEEP_TASK_STACK_SIZE 2048
+#define MCU_EXIT_DEEPSLEEP_TASK_NAME "Exit Deepsleep Task"
+#define MCU_EXIT_DEEPSLEEP_TASK_PRIORITY 1
+
+#define MCU_ENTER_HIBERNATE_TASK_STACK_SIZE 2048
+#define MCU_ENTER_HIBERNATE_TASK_NAME "Enter Hibernate Task"
+#define MCU_ENTER_HIBERNATE_TASK_PRIORITY 1
+
+#define MCU_EXIT_HIBERNATE_TASK_STACK_SIZE 2048
+#define MCU_EXIT_HIBERNATE_TASK_NAME "Exit Hibernate Task"
+#define MCU_EXIT_HIBERNATE_TASK_PRIORITY 1
 
 // MICROPHONE
 #define MICROPHONE_TASK_STACK_SIZE 2048
 #define MICROPHONE_TASK_NAME "Microphone Task"
 #define MICROPHONE_TASK_PRIORITY 1
 
+/* STATUS TASK */
+#define STATUS_TASK_STACK_SIZE 2048
+#define STATUS_TASK_NAME "Status Check Task"
+#define STATUS_TASK_PRIORITY 10
+
+void TimerPeriodicIntHandler();
+
 static void InitializeBoard();
 
 // The queue used to send strings to the task1.
 OsiMsgQ_t MsgQ;
 
-#ifndef USE_TIRTOS
-	/* in case of TI-RTOS don't include startup_*.c in app project */
-	#if defined(gcc) || defined(ccs)
-		extern void (* const g_pfnVectors[])(void);
-	#endif
-
-	#if defined(ewarm)
-		extern uVectorEntry __vector_table;
-	#endif
-#endif
+/* We are using this for FREERTOS */
+extern void (* const g_pfnVectors[])(void);
 
 //*****************************************************************************
 // FreeRTOS User Hook Functions enabled in FreeRTOSConfig.h
 //*****************************************************************************
-#ifdef USE_FREERTOS
+//! \brief Application defined hook (or callback) function - assert
+//!
+//! \param[in]  pcFile - Pointer to the File Name
+//! \param[in]  ulLine - Line Number
+void vAssertCalled( const char *pcFile, unsigned long ulLine )
+{
+	//Handle Assert here
+	while(1);
+}
 
-	//! \brief Application defined hook (or callback) function - assert
-	//!
-	//! \param[in]  pcFile - Pointer to the File Name
-	//! \param[in]  ulLine - Line Number
-	void vAssertCalled( const char *pcFile, unsigned long ulLine )
-	{
-		//Handle Assert here
-		while(1);
-	}
+void vApplicationIdleHook()
+{
+	//Handle Idle Hook for Profiling, Power Management etc
+}
 
-	void vApplicationIdleHook()
-	{
-		//Handle Idle Hook for Profiling, Power Management etc
-	}
+void vApplicationMallocFailedHook()
+{
+	//Handle Memory Allocation Errors
+	while(1);
+}
 
-	void vApplicationMallocFailedHook()
-	{
-		//Handle Memory Allocation Errors
-		while(1);
-	}
-
-	void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
-									   signed char *pcTaskName)
-	{
-		//Handle FreeRTOS Stack Overflow
-		while(1);
-	}
-
-#endif //USE_FREERTOS
+void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
+								   signed char *pcTaskName)
+{
+	//Handle FreeRTOS Stack Overflow
+	while(1);
+}
 
 // EFFECTS: Initializes the board.
 static void InitializeBoard()
 {
-	/* In case of TI-RTOS vector table is initialize by OS itself */
-	#ifndef USE_TIRTOS
-		//
-		// Set vector table base
-		//
-		#if defined(ccs) || defined(gcc)
-			MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-		#endif
-
-		#if defined(ewarm)
-			MAP_IntVTableBaseSet((unsigned long)&__vector_table);
-		#endif
-
-	#endif
+	MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
 
 	// Enable Processor
 	MAP_IntMasterEnable();
 	MAP_IntEnable(FAULT_SYSTICK);
 
 	PRCMCC3200MCUInit();
+}
+
+/* EFFECTS: Checks the tasks and ends them if they are inconsistent */
+void CheckStatusTask(void *pvParameters) {
+
 }
 
 int main( void )
@@ -149,9 +148,8 @@ int main( void )
 
 	#ifndef NOTERM
 		InitTerm();
+	    ClearTerm();
 	#endif
-
-    ClearTerm();
 
     // Creating a queue for 10 elements.
     OsiReturnVal_e osi_retVal;
@@ -184,11 +182,11 @@ int main( void )
 //    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME, WIRELESS_AP_TASK_STACK_SIZE,
 //			NULL, WIRELESS_AP_TASK_PRIORITY, NULL);
 
-    if(lRetVal < 0)
-    {
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
+//    if(lRetVal < 0)
+//    {
+//        ERR_PRINT(lRetVal);
+//        LOOP_FOREVER();
+//    }
 
     // Start the task scheduler
     osi_start();

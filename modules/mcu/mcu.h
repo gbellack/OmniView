@@ -14,14 +14,13 @@ typedef enum {
 
 // http://processors.wiki.ti.com/index.php/CC32xx_Sensor_Profile_Application
 // EFFECTS: Puts the processor in hibernate mode.
-extern void enterHibernateMode();
+extern void enterHibernateMode(void *pvParameters);
 
 // EFFECTS: Exit hibernate mode.
-extern void exitHibernateMode();
+extern void exitHibernateMode(void *pvParameters);
 
-extern void enterDeepSleepMode();
+extern void enterDeepSleepMode(void *pvParameters);
 
-extern void exitDeepSleepMode();
-
+extern void exitDeepSleepMode(void *pvParameters);
 
 #endif

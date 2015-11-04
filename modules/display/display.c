@@ -1,21 +1,10 @@
 #include "display.h"
 #include "display_driver.h"
+#include "display_network.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// Driverlib includes
-#include "hw_types.h"
-#include "hw_ints.h"
-#include "hw_memmap.h"
-#include "hw_common_reg.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "interrupt.h"
-#include "prcm.h"
-#include "utils.h"
-#include "uart.h"
 
 // Common interface includes
 #ifndef NOTERM
@@ -24,6 +13,16 @@
 
 #include "i2c_if.h"
 
+/* NAME PARAMETERS */
+#define MAX_NAMES_ALLOCATED 5
+#define MAX_NAME_LENGTH 15
+#define NAME_TEXT_SIZE 2
+
+#define TEXT_COLOR WHITE
+
+/* Array of first and last names */
+char firstName[MAX_NAMES_ALLOCATED][MAX_NAME_LENGTH];
+char lastName[MAX_NAMES_ALLOCATED][MAX_NAME_LENGTH];
 
 void DisplayTask(void *pvParameters) {
 
