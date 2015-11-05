@@ -12,8 +12,6 @@
 /* PIN LAYOUT CONFIGURATIONS */
 
 #define DISPLAY_RESET_PIN 	PIN_05 /* Pin 10 for display reset */
-#define DISPLAY_SCL_PIN 	PIN_01 /* Pin 1 for display I2C scl */
-#define DISPLAY_SDA_PIN 	PIN_02 /* Pin 2 for display I2c sda */
 
 /* OLED CONFIGURATIONS */
 
