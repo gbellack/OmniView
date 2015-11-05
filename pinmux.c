@@ -70,17 +70,35 @@ void PinMuxConfig(void)
 	MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
 	/* DISPLAY */
+//     Configure PIN_01 for I2C0 I2C_SCL
 
-    //
-    // Configure PIN_01 for I2C0 I2C_SCL
-    //
     MAP_PinTypeI2C(PIN_01, PIN_MODE_1);
 
-    //
-    // Configure PIN_02 for I2C0 I2C_SDA
-    //
+//     Configure PIN_02 for I2C0 I2C_SDA
+
     MAP_PinTypeI2C(PIN_02, PIN_MODE_1);
 
+    MAP_PinTypeGPIO(PIN_05, PIN_MODE_0, false);
+
+    //
+    // Configure PIN_64 for GPIOOutput
+    //
+//    MAP_PinTypeGPIO(PIN_64, PIN_MODE_0, false);
+//    PinModeSet(PIN_64, PIN_MODE_0);
+//	PinConfigSet(PIN_64, PIN_STRENGTH_6MA, PIN_TYPE_STD);
+//
+//    MAP_GPIODirModeSet(GPIOA3_BASE, 0x2, GPIO_DIR_MODE_OUT);
+
+    // SCL
+//    PinModeSet(PIN_16, PIN_MODE_9);
+//    PinConfigSet(PIN_16,PIN_STRENGTH_6MA,PIN_TYPE_OD_PU);
+//
+//    // SDA
+//    PinModeSet(PIN_17, PIN_MODE_9);
+//    PinConfigSet(PIN_17,PIN_STRENGTH_6MA,PIN_TYPE_OD_PU);
+
+//    PinModeSet(PIN_02, PIN_MODE_1);
+//    PinConfigSet(PIN_02,PIN_STRENGTH_6MA,PIN_TYPE_OD_PU);
 
     /* CAMERA */
 

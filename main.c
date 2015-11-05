@@ -68,7 +68,7 @@
 #define MCU_EXIT_HIBERNATE_TASK_NAME "Exit Hibernate Task"
 #define MCU_EXIT_HIBERNATE_TASK_PRIORITY 1
 
-// MICROPHONE
+/* MICROPHONE */
 #define MICROPHONE_TASK_STACK_SIZE 2048
 #define MICROPHONE_TASK_NAME "Microphone Task"
 #define MICROPHONE_TASK_PRIORITY 1
@@ -76,7 +76,7 @@
 /* STATUS TASK */
 #define STATUS_TASK_STACK_SIZE 2048
 #define STATUS_TASK_NAME "Status Check Task"
-#define STATUS_TASK_PRIORITY 10
+#define STATUS_TASK_PRIORITY 8
 
 /* Prototypes */
 void TimerPeriodicIntHandler();
@@ -87,37 +87,6 @@ OsiMsgQ_t MsgQ;
 
 /* We are using this for FREERTOS */
 extern void (* const g_pfnVectors[])(void);
-
-//*****************************************************************************
-// FreeRTOS User Hook Functions enabled in FreeRTOSConfig.h
-//*****************************************************************************
-//! \brief Application defined hook (or callback) function - assert
-//!
-//! \param[in]  pcFile - Pointer to the File Name
-//! \param[in]  ulLine - Line Number
-void vAssertCalled( const char *pcFile, unsigned long ulLine )
-{
-	//Handle Assert here
-	while(1);
-}
-
-void vApplicationIdleHook()
-{
-	//Handle Idle Hook for Profiling, Power Management etc
-}
-
-void vApplicationMallocFailedHook()
-{
-	//Handle Memory Allocation Errors
-	while(1);
-}
-
-void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
-								   signed char *pcTaskName)
-{
-	//Handle FreeRTOS Stack Overflow
-	while(1);
-}
 
 // EFFECTS: Initializes the board.
 static void InitializeBoard()
@@ -176,9 +145,9 @@ int main( void )
 //					NULL, CAMERA_TASK_PRIORITY, NULL);
 
     // Create the Queue Wireless task
-    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME,
-								WIRELESS_AP_TASK_STACK_SIZE, NULL,
-								WIRELESS_AP_TASK_PRIORITY, NULL);
+//    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME,
+//								WIRELESS_AP_TASK_STACK_SIZE, NULL,
+//								WIRELESS_AP_TASK_PRIORITY, NULL);
 
 //    if(lRetVal < 0)
 //    {

@@ -11,7 +11,7 @@
 
 /* PIN LAYOUT CONFIGURATIONS */
 
-#define DISPLAY_RESET_PIN 	PIN_17 /* Pin 10 for display reset */
+#define DISPLAY_RESET_PIN 	PIN_05 /* Pin 10 for display reset */
 #define DISPLAY_SCL_PIN 	PIN_01 /* Pin 1 for display I2C scl */
 #define DISPLAY_SDA_PIN 	PIN_02 /* Pin 2 for display I2c sda */
 
@@ -72,6 +72,24 @@
 
 /* Swaps the two values */
 #define swap(a, b) { int16_t t = a; a = b; b = t; }
+#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+
+/* Printing functions */
+extern void print(const char *str);
+extern void println(const char *str);
+extern void PrintHelper(uint8_t c);
+
+extern void FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+extern void DrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+extern void DrawFastVLineInternal(int16_t x, int16_t __y, int16_t __h, uint16_t color);
+extern void DrawFastHLineInternal(int16_t x, int16_t y, int16_t w, uint16_t color);
+
+// These exist only with Adafruit_GFX (no subclass overrides)
+extern void DrawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size);
+extern void SetCursor(int16_t x, int16_t y);
+extern void SetTextColor(uint16_t c);
+extern void SetTextSize(uint8_t s);
+extern void SetTextWrap(uint8_t w);
 
 /* REQUIRES: The reset pin.
  * EFFECTS: Initializes the display pins.
