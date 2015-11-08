@@ -27,19 +27,21 @@
 #include "common.h"
 #include "pinmux.h"
 
-#include "modules/camera/camera.h"
 #include "modules/display/display.h"
 #include "modules/display/display_driver.h"
 #include "modules/mcu/mcu.h"
 #include "modules/microphone/microphone.h"
 #include "modules/wireless/wireless.h"
-#include "httpserverapp.h"
+
+/* Camera App Task */
+#include "modules/camera/httpserverapp.h"
 
 //*****************************************************************************
 //                      MACRO DEFINITIONS
 //*****************************************************************************
 #define UART_PRINT              Report
 #define SPAWN_TASK_PRIORITY     9
+#define MAX_MSG_LENGTH 16
 
 // CAMERA
 #define CAMERA_TASK_STACK_SIZE 2048
@@ -56,7 +58,7 @@
 #define WIRELESS_AP_TASK_NAME "Wireless Task"
 #define WIRELESS_AP_TASK_PRIORITY 2
 
-// MCU
+/* MCU POWER CONSUMPTION */
 #define MCU_ENTER_DEEPSLEEP_TASK_STACK_SIZE 2048
 #define MCU_ENTER_DEEPSLEEP_TASK_NAME "Enter Deepsleep Task"
 #define MCU_ENTER_DEEPSLEEP_TASK_PRIORITY 1
@@ -83,13 +85,17 @@
 #define STATUS_TASK_NAME "Status Check Task"
 #define STATUS_TASK_PRIORITY 8
 
+/* WIRELESS TASK */
+#define WEBSOCKET_TASK_NAME "WebSocketApp"
+#define WEBSOCKET_TASK_STACK_SIZE 2048
+#define WEBSOCKET_TASK_PRIORITY 1
+
 /* Prototypes */
 void TimerPeriodicIntHandler();
 static void InitializeBoard();
 
 // The queue used to send strings to the task1.
 OsiMsgQ_t MsgQ;
-
 
 //*****************************************************************************
 //                      GLOBAL VARIABLES for VECTOR TABLE
@@ -101,13 +107,6 @@ extern void (* const g_pfnVectors[])(void);
 extern uVectorEntry __vector_table;
 #endif
 
-//*****************************************************************************
-//                          LOCAL DEFINES
-//*****************************************************************************
-#define APP_NAME		        "WebSocket"
-#define SPAWN_TASK_PRIORITY     9
-#define HTTP_SERVER_APP_TASK_PRIORITY  1
-#define OSI_STACK_SIZE          2048
 
 //*****************************************************************************
 //
@@ -118,54 +117,6 @@ extern uVectorEntry __vector_table;
 //! \return none
 //!
 //*****************************************************************************
-
-#ifndef NOTERM
-static void
-DisplayBanner(char * AppName)
-{
-
-    Report("\n\n\n\r");
-    Report("\t\t *************************************************\n\r");
-    Report("\t\t	  CC3200 %s Application       \n\r", AppName);
-    Report("\t\t *************************************************\n\r");
-    Report("\n\n\n\r");
-}
-#endif
-
-
-//*****************************************************************************
-//
-//! Board Initialization & Configuration
-//!
-//! \param  None
-//!
-//! \return None
-//
-//*****************************************************************************
-static void
-BoardInit(void)
-{
-/* In case of TI-RTOS vector table is initialize by OS itself */
-#ifndef USE_TIRTOS
-  //
-  // Set vector table base
-  //
-#if defined(ccs) || defined(gcc)
-    IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-#endif
-#if defined(ewarm)
-    IntVTableBaseSet((unsigned long)&__vector_table);
-#endif
-#endif
-    //
-    // Enable Processor
-    //
-    MAP_IntMasterEnable();
-    MAP_IntEnable(FAULT_SYSTICK);
-    PRCMCC3200MCUInit();
-}
-
-
 
 /* We are using this for FREERTOS */
 extern void (* const g_pfnVectors[])(void);
@@ -190,15 +141,15 @@ void CheckStatusTask(void *pvParameters) {
 int main( void )
 {
     InitializeBoard();
-    BoardInit();
+
     UDMAInit();
+
     // Configure pins.
     PinMuxConfig();
 
 	#ifndef NOTERM
 		InitTerm();
 	    ClearTerm();
-	    DisplayBanner(APP_NAME);
 	#endif
 
     // Creating a queue for 10 elements.
@@ -222,14 +173,10 @@ int main( void )
 
 	// Create the Queue Display task
 	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
-					NULL, CAMERA_TASK_PRIORITY, NULL);
+					NULL, DISPLAY_TASK_PRIORITY, NULL);
 
-    osi_TaskCreate(HttpServerAppTask,
-                    "WebSocketApp",
-                        OSI_STACK_SIZE,
-                        NULL,
-                        HTTP_SERVER_APP_TASK_PRIORITY,
-                        NULL );
+    osi_TaskCreate(HttpServerAppTask, WEBSOCKET_TASK_NAME, WEBSOCKET_TASK_STACK_SIZE,
+    				NULL, WEBSOCKET_TASK_PRIORITY, NULL);
 
 //	// Create the Queue Camera task
 //	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
@@ -251,56 +198,3 @@ int main( void )
 
     return 0;
 }
-
-
-//****************************************************************************
-//						WEBSOCKET CAMERA MAIN FUNCTION
-//****************************************************************************
-/*void main() {
-
-	//
-	// Board Initialization
-	//
-	BoardInit();
-
-	//
-	// Enable and configure DMA
-	//
-	UDMAInit();
-	//
-	// Pinmux for UART
-	//
-	PinMuxConfig();
-
-#ifndef NOTERM
-	//
-	// Configuring UART
-	//
-	InitTerm();
-
-    //
-    // Display Application Banner
-    //
-    DisplayBanner(APP_NAME);
-#endif
-    //
-    // Start the SimpleLink Host
-    //
-    VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
-    //
-    // Start the HttpServer Task
-    //
-    //
-
-    osi_TaskCreate(HttpServerAppTask,
-                    "WebSocketApp",
-                        OSI_STACK_SIZE,
-                        NULL,
-                        HTTP_SERVER_APP_TASK_PRIORITY,
-                        NULL );
-
-    UART_PRINT("HttpServerApp Initialized \n\r");
-
-}
-
-*/

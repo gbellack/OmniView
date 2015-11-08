@@ -66,7 +66,7 @@
 #include "uart_if.h"
 #include "common.h"
 
-#include "websocketapp.h"
+#include "WebSockHandler.h"
 #include "httpserverapp.h"
 #include "camera_app.h"
 #include "i2cconfig.h"

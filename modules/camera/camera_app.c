@@ -67,12 +67,11 @@
 #include "uart_if.h"
 #include "udma_if.h"
 
-#include "pinmux.h"
+#include "../../pinmux.h"
 #include "camera_app.h"
 #include "camera.h"
 #include "mt9d111.h"
 #include "i2cconfig.h"
-
 
 //*****************************************************************************
 // Macros
