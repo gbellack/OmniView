@@ -72,11 +72,6 @@ void PinMuxConfig(void)
 	MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
 	/* DISPLAY */
-
-    MAP_PinTypeI2C(PIN_16, PIN_MODE_9);
-
-    MAP_PinTypeI2C(PIN_17, PIN_MODE_9);
-
     MAP_PinTypeGPIO(PIN_05, PIN_MODE_0, false);
 
     /* CAMERA */

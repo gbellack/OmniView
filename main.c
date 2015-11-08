@@ -97,27 +97,6 @@ static void InitializeBoard();
 // The queue used to send strings to the task1.
 OsiMsgQ_t MsgQ;
 
-//*****************************************************************************
-//                      GLOBAL VARIABLES for VECTOR TABLE
-//*****************************************************************************
-#if defined(ccs)
-extern void (* const g_pfnVectors[])(void);
-#endif
-#if defined(ewarm)
-extern uVectorEntry __vector_table;
-#endif
-
-
-//*****************************************************************************
-//
-//! Application startup display on UART
-//!
-//! \param  none
-//!
-//! \return none
-//!
-//*****************************************************************************
-
 /* We are using this for FREERTOS */
 extern void (* const g_pfnVectors[])(void);
 
@@ -172,8 +151,8 @@ int main( void )
 	}
 
 	// Create the Queue Display task
-	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
-					NULL, DISPLAY_TASK_PRIORITY, NULL);
+//	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
+//					NULL, DISPLAY_TASK_PRIORITY, NULL);
 
     osi_TaskCreate(HttpServerAppTask, WEBSOCKET_TASK_NAME, WEBSOCKET_TASK_STACK_SIZE,
     				NULL, WEBSOCKET_TASK_PRIORITY, NULL);
@@ -187,11 +166,6 @@ int main( void )
 //								WIRELESS_AP_TASK_STACK_SIZE, NULL,
 //								WIRELESS_AP_TASK_PRIORITY, NULL);
 
-//    if(lRetVal < 0)
-//    {
-//        ERR_PRINT(lRetVal);
-//        LOOP_FOREVER();
-//    }
 
     // Start the task scheduler
     osi_start();

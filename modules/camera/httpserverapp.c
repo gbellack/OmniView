@@ -62,7 +62,7 @@
 #include "HttpRequest.h"
 
 // Common-interface includes
-#include "network_if.h"
+#include "../wireless/wireless.h"
 #include "uart_if.h"
 #include "common.h"
 
@@ -86,7 +86,6 @@ UINT8 g_success = 0;
 int g_close = 0;
 UINT16 g_uConnection;
 OsiTaskHandle g_iCameraTaskHdl = 0;
-
 
 void WebSocketCloseSessionHandler(void)
 {
