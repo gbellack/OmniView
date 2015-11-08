@@ -15,10 +15,14 @@
 #include "rom_map.h"
 #include "uart.h"
 #include "utils.h"
+#include "systick.h"
+#include "pin.h"
+#include "simplelink.h"
 
 #ifndef NOTERM
 	#include "uart_if.h"
 #endif
+#include "udma_if.h"
 
 #include "common.h"
 #include "pinmux.h"
@@ -29,6 +33,7 @@
 #include "modules/mcu/mcu.h"
 #include "modules/microphone/microphone.h"
 #include "modules/wireless/wireless.h"
+#include "httpserverapp.h"
 
 //*****************************************************************************
 //                      MACRO DEFINITIONS
@@ -85,6 +90,83 @@ static void InitializeBoard();
 // The queue used to send strings to the task1.
 OsiMsgQ_t MsgQ;
 
+
+//*****************************************************************************
+//                      GLOBAL VARIABLES for VECTOR TABLE
+//*****************************************************************************
+#if defined(ccs)
+extern void (* const g_pfnVectors[])(void);
+#endif
+#if defined(ewarm)
+extern uVectorEntry __vector_table;
+#endif
+
+//*****************************************************************************
+//                          LOCAL DEFINES
+//*****************************************************************************
+#define APP_NAME		        "WebSocket"
+#define SPAWN_TASK_PRIORITY     9
+#define HTTP_SERVER_APP_TASK_PRIORITY  1
+#define OSI_STACK_SIZE          2048
+
+//*****************************************************************************
+//
+//! Application startup display on UART
+//!
+//! \param  none
+//!
+//! \return none
+//!
+//*****************************************************************************
+
+#ifndef NOTERM
+static void
+DisplayBanner(char * AppName)
+{
+
+    Report("\n\n\n\r");
+    Report("\t\t *************************************************\n\r");
+    Report("\t\t	  CC3200 %s Application       \n\r", AppName);
+    Report("\t\t *************************************************\n\r");
+    Report("\n\n\n\r");
+}
+#endif
+
+
+//*****************************************************************************
+//
+//! Board Initialization & Configuration
+//!
+//! \param  None
+//!
+//! \return None
+//
+//*****************************************************************************
+static void
+BoardInit(void)
+{
+/* In case of TI-RTOS vector table is initialize by OS itself */
+#ifndef USE_TIRTOS
+  //
+  // Set vector table base
+  //
+#if defined(ccs) || defined(gcc)
+    IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+#endif
+#if defined(ewarm)
+    IntVTableBaseSet((unsigned long)&__vector_table);
+#endif
+#endif
+    //
+    // Enable Processor
+    //
+    MAP_IntMasterEnable();
+    MAP_IntEnable(FAULT_SYSTICK);
+    PRCMCC3200MCUInit();
+}
+
+
+
 /* We are using this for FREERTOS */
 extern void (* const g_pfnVectors[])(void);
 
@@ -108,13 +190,15 @@ void CheckStatusTask(void *pvParameters) {
 int main( void )
 {
     InitializeBoard();
-
+    BoardInit();
+    UDMAInit();
     // Configure pins.
     PinMuxConfig();
 
 	#ifndef NOTERM
 		InitTerm();
 	    ClearTerm();
+	    DisplayBanner(APP_NAME);
 	#endif
 
     // Creating a queue for 10 elements.
@@ -140,6 +224,13 @@ int main( void )
 	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
 					NULL, CAMERA_TASK_PRIORITY, NULL);
 
+    osi_TaskCreate(HttpServerAppTask,
+                    "WebSocketApp",
+                        OSI_STACK_SIZE,
+                        NULL,
+                        HTTP_SERVER_APP_TASK_PRIORITY,
+                        NULL );
+
 //	// Create the Queue Camera task
 //	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
 //					NULL, CAMERA_TASK_PRIORITY, NULL);
@@ -160,3 +251,56 @@ int main( void )
 
     return 0;
 }
+
+
+//****************************************************************************
+//						WEBSOCKET CAMERA MAIN FUNCTION
+//****************************************************************************
+/*void main() {
+
+	//
+	// Board Initialization
+	//
+	BoardInit();
+
+	//
+	// Enable and configure DMA
+	//
+	UDMAInit();
+	//
+	// Pinmux for UART
+	//
+	PinMuxConfig();
+
+#ifndef NOTERM
+	//
+	// Configuring UART
+	//
+	InitTerm();
+
+    //
+    // Display Application Banner
+    //
+    DisplayBanner(APP_NAME);
+#endif
+    //
+    // Start the SimpleLink Host
+    //
+    VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
+    //
+    // Start the HttpServer Task
+    //
+    //
+
+    osi_TaskCreate(HttpServerAppTask,
+                    "WebSocketApp",
+                        OSI_STACK_SIZE,
+                        NULL,
+                        HTTP_SERVER_APP_TASK_PRIORITY,
+                        NULL );
+
+    UART_PRINT("HttpServerApp Initialized \n\r");
+
+}
+
+*/
