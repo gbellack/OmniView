@@ -23,6 +23,12 @@ Credits to: [Texas Instruments Uniflash Wiki page](http://processors.wiki.ti.com
 1. main.c : This is where the main program lies. All things related to scheduling is done here.
 2. pinmux.c/h : This is where we specify which pins are being used for certain protocols by the program.
 3. modules folder: This stores all the modules/component libraries. More on that later...
+4. modules/display/display_driver.c/h: This file implements the driver for the display. It provides a good interface for the OLED display that we are using.
+5. modules/display/display.c/h: This file contains the freeRTOS display task, as well as the functions related to how the OLED is being used in this application.
+6. modules/camera/camera_driver.c/h: This file implements the driver for the camera. It provides a good interface for the camera.
+7. modules/camera/camera.c/h: This file contains the freeRTOS camera task, as well as the functions related to how the camera is being used in this application.
+8. modules/camera/camera_network.c/h: This file will implement everything to do with how the image is being sent over the network.
+9. modules/mcu/mcu.c/h: This file implements power modes for the CC3200MOD microcontroller that we are using.
 
 ###Version Control for Code Composer Studio Project
 The .gitignore file on this repository should do the trick, but please:  
