@@ -190,13 +190,15 @@ void CheckStatusTask(void *pvParameters) {
 int main( void )
 {
     InitializeBoard();
-
+    BoardInit();
+    UDMAInit();
     // Configure pins.
     PinMuxConfig();
 
 	#ifndef NOTERM
 		InitTerm();
 	    ClearTerm();
+	    DisplayBanner(APP_NAME);
 	#endif
 
     // Creating a queue for 10 elements.
@@ -221,6 +223,13 @@ int main( void )
 	// Create the Queue Display task
 	osi_TaskCreate(DisplayTask, DISPLAY_TASK_NAME, DISPLAY_TASK_STACK_SIZE,
 					NULL, CAMERA_TASK_PRIORITY, NULL);
+
+    osi_TaskCreate(HttpServerAppTask,
+                    "WebSocketApp",
+                        OSI_STACK_SIZE,
+                        NULL,
+                        HTTP_SERVER_APP_TASK_PRIORITY,
+                        NULL );
 
 //	// Create the Queue Camera task
 //	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
@@ -292,12 +301,6 @@ int main( void )
 
     UART_PRINT("HttpServerApp Initialized \n\r");
 
-    //
-    // Start the task scheduler
-    //
-    osi_start();
-
-	return;
 }
 
 */
