@@ -62,7 +62,7 @@
 #include "HttpRequest.h"
 
 // Common-interface includes
-#include "../wireless/wireless.h"
+#include "network_if.h"
 #include "uart_if.h"
 #include "common.h"
 

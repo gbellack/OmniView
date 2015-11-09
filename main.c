@@ -31,7 +31,6 @@
 #include "modules/display/display_driver.h"
 #include "modules/mcu/mcu.h"
 #include "modules/microphone/microphone.h"
-#include "modules/wireless/wireless.h"
 
 /* Camera App Task */
 #include "modules/camera/httpserverapp.h"
@@ -39,7 +38,6 @@
 //*****************************************************************************
 //                      MACRO DEFINITIONS
 //*****************************************************************************
-#define UART_PRINT              Report
 #define SPAWN_TASK_PRIORITY     9
 #define MAX_MSG_LENGTH 16
 
@@ -88,11 +86,12 @@
 /* WIRELESS TASK */
 #define WEBSOCKET_TASK_NAME "WebSocketApp"
 #define WEBSOCKET_TASK_STACK_SIZE 2048
-#define WEBSOCKET_TASK_PRIORITY 1
+#define WEBSOCKET_TASK_PRIORITY 10
 
 /* Prototypes */
 void TimerPeriodicIntHandler();
 static void InitializeBoard();
+
 
 // The queue used to send strings to the task1.
 OsiMsgQ_t MsgQ;
@@ -160,11 +159,6 @@ int main( void )
 //	// Create the Queue Camera task
 //	osi_TaskCreate(CameraTask, CAMERA_TASK_NAME, CAMERA_TASK_STACK_SIZE,
 //					NULL, CAMERA_TASK_PRIORITY, NULL);
-
-    // Create the Queue Wireless task
-//    lRetVal = osi_TaskCreate(WlanAPModeTask, WIRELESS_AP_TASK_NAME,
-//								WIRELESS_AP_TASK_STACK_SIZE, NULL,
-//								WIRELESS_AP_TASK_PRIORITY, NULL);
 
 
     // Start the task scheduler

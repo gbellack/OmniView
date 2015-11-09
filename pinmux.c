@@ -74,82 +74,80 @@ void PinMuxConfig(void)
 	/* DISPLAY */
     MAP_PinTypeGPIO(PIN_05, PIN_MODE_0, false);
 
-    /* CAMERA */
-    //
-        // Configure PIN_55 for CAMERA0 CAM_pCLK
-        //
-        MAP_PinTypeCamera(PIN_55, PIN_MODE_4);
+	/* CAMERA */
 
-        //
-        // Configure PIN_58 for CAMERA0 CAM_pDATA7
-        //
-        MAP_PinTypeCamera(PIN_58, PIN_MODE_4);
+	//
+	// Configure PIN_55 for CAMERA0 CAM_pCLK
+	//
+	MAP_PinTypeCamera(PIN_55, PIN_MODE_4);
 
-        //
-        // Configure PIN_59 for CAMERA0 CAM_pDATA6
-        //
-        MAP_PinTypeCamera(PIN_59, PIN_MODE_4);
+	//
+	// Configure PIN_58 for CAMERA0 CAM_pDATA7
+	//
+	MAP_PinTypeCamera(PIN_58, PIN_MODE_4);
 
-        //
-        // Configure PIN_60 for CAMERA0 CAM_pDATA5
-        //
-        MAP_PinTypeCamera(PIN_60, PIN_MODE_4);
+	//
+	// Configure PIN_59 for CAMERA0 CAM_pDATA6
+	//
+	MAP_PinTypeCamera(PIN_59, PIN_MODE_4);
 
-        //
-        // Configure PIN_61 for CAMERA0 CAM_pDATA4
-        //
-        MAP_PinTypeCamera(PIN_61, PIN_MODE_4);
+	//
+	// Configure PIN_60 for CAMERA0 CAM_pDATA5
+	//
+	MAP_PinTypeCamera(PIN_60, PIN_MODE_4);
 
-        //
-        // Configure PIN_02 for CAMERA0 CAM_pXCLK
-        //
-        MAP_PinTypeCamera(PIN_02, PIN_MODE_4);
+	//
+	// Configure PIN_61 for CAMERA0 CAM_pDATA4
+	//
+	MAP_PinTypeCamera(PIN_61, PIN_MODE_4);
 
-        //
-        // Configure PIN_03 for CAMERA0 CAM_vS
-        //
-        MAP_PinTypeCamera(PIN_03, PIN_MODE_4);
+	//
+	// Configure PIN_02 for CAMERA0 CAM_pXCLK
+	//
+	MAP_PinTypeCamera(PIN_02, PIN_MODE_4);
 
-        //
-        // Configure PIN_04 for CAMERA0 CAM_hS
-        //
-        MAP_PinTypeCamera(PIN_04, PIN_MODE_4);
+	//
+	// Configure PIN_03 for CAMERA0 CAM_vS
+	//
+	MAP_PinTypeCamera(PIN_03, PIN_MODE_4);
 
-        //
-        // Configure PIN_05 for CAMERA0 CAM_pDATA8
-        //
-        MAP_PinTypeCamera(PIN_05, PIN_MODE_4);
+	//
+	// Configure PIN_04 for CAMERA0 CAM_hS
+	//
+	MAP_PinTypeCamera(PIN_04, PIN_MODE_4);
 
-        //
-        // Configure PIN_06 for CAMERA0 CAM_pDATA9
-        //
-        MAP_PinTypeCamera(PIN_06, PIN_MODE_4);
+	//
+	// Configure PIN_05 for CAMERA0 CAM_pDATA8
+	//
+	MAP_PinTypeCamera(PIN_05, PIN_MODE_4);
 
-        //
-        // Configure PIN_07 for CAMERA0 CAM_pDATA10
-        //
-        MAP_PinTypeCamera(PIN_07, PIN_MODE_4);
+	//
+	// Configure PIN_06 for CAMERA0 CAM_pDATA9
+	//
+	MAP_PinTypeCamera(PIN_06, PIN_MODE_4);
 
-        //
-        // Configure PIN_08 for CAMERA0 CAM_pDATA11
-        //
-        MAP_PinTypeCamera(PIN_08, PIN_MODE_4);
+	//
+	// Configure PIN_07 for CAMERA0 CAM_pDATA10
+	//
+	MAP_PinTypeCamera(PIN_07, PIN_MODE_4);
 
-        //
-        // Configure PIN_16 for I2C0 I2C_SCL
-        //
-        MAP_PinTypeI2C(PIN_16, PIN_MODE_9);
+	//
+	// Configure PIN_08 for CAMERA0 CAM_pDATA11
+	//
+	MAP_PinTypeCamera(PIN_08, PIN_MODE_4);
 
-        //
-        // Configure PIN_17 for I2C0 I2C_SDA
-        //
-        MAP_PinTypeI2C(PIN_17, PIN_MODE_9);
+	//
+	// Configure PIN_16 for I2C0 I2C_SCL
+	//
+	MAP_PinTypeI2C(PIN_16, PIN_MODE_9);
 
-        //
-        // Configure PIN_01 for MODE0
-        //
-        MAP_PinTypeI2C(PIN_01, PIN_MODE_0);
+	//
+	// Configure PIN_17 for I2C0 I2C_SDA
+	//
+	MAP_PinTypeI2C(PIN_17, PIN_MODE_9);
 
-
-
+	//
+	// Configure PIN_01 for MODE0
+	//
+	MAP_PinTypeI2C(PIN_01, PIN_MODE_0);
 }
