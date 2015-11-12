@@ -18,7 +18,7 @@
 void InitializeModules() {
 
 	/* Display */
-    InitializeDisplay();
+//    InitializeDisplay();
 
     /* Camera */
 
@@ -28,6 +28,7 @@ void InitializeModules() {
 
 void FaceRecognitionMode(void *pvParameters) {
 
+    InitializeDisplay();
 	ClearDisplay();
 	SetCursor(0,0);
 	DisplayName("GARRISON", "BELLACK");
