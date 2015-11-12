@@ -39,11 +39,12 @@ uint16_t textcolor, textbgcolor;
 uint8_t textsize, rotation, wrap;
 
 void DisplayName(const char *firstName, const char *lastName) {
-	println(firstName);
-	println(lastName);
+	DisplayPrint("  ");
+	DisplayPrintLine(lastName);
+	DisplayPrintLine(firstName);
 }
 
-void print(const char *str) {
+void DisplayPrint(const char *str) {
 	int i = 0;
 	while (str[i] != '\0') {
 		PrintHelper(str[i]);
@@ -51,32 +52,39 @@ void print(const char *str) {
 	}
 }
 
-void println(const char *str) {
+void DisplayPrintLine(const char *str) {
 	int i = 0;
 	while (str[i] != '\0') {
 		PrintHelper(str[i]);
 		++i;
 	}
-
-	/* Reset to next line */
-	cursor_y += textsize*8;
-    cursor_x = 0;
+	IncrementLine();
 }
 
 void PrintHelper(uint8_t c) {
-  if (c == '\n') {
-    cursor_y += textsize*8;
-    cursor_x  = 0;
-  } else if (c == '\r') {
-    // skip em
-  } else {
-    DrawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
-    cursor_x += textsize * 6;
-    if (wrap && (cursor_x > (SSD1306_LCDWIDTH - textsize * 6))) {
-      cursor_y += textsize*8;
-      cursor_x = 0;
-    }
-  }
+
+	// TODO
+	/* If new line escape or if x is too far away */
+	if (c == '\n') {
+		IncrementLine();
+	}
+	else if (c == '\r') {
+	// skip em
+	}
+	else {
+		DrawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+
+		cursor_x += textsize * 6;
+
+		if (wrap && (cursor_x > ((SSD1306_LCDWIDTH / 2) - textsize * 6))) {
+			IncrementLine();
+		}
+	}
+}
+
+void IncrementLine() {
+	cursor_y -= textsize*8;
+	cursor_x = 0;
 }
 
 void FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
@@ -443,6 +451,9 @@ void ClearDisplay() {
 	Send(SSD1306_PAGEADDR);
 	Send(0x0000); // Page start address (0 = reset)
 	Send(0x0700); // Page end address
+
+	/* Set the cursor back to the original position */
+	SetCursor(0, SSD1306_LCDHEIGHT - textsize*8);
 }
 
 /* EFFECTS: Displays whatever that is stored in buffer */

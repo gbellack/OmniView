@@ -83,8 +83,8 @@
 extern void DisplayName(const char *firstName, const char *lastName);
 
 /* Printing functions */
-extern void print(const char *str);
-extern void println(const char *str);
+extern void DisplayPrint(const char *str);
+extern void DisplayPrintLine(const char *str);
 extern void PrintHelper(uint8_t c);
 
 extern void FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
@@ -98,6 +98,9 @@ extern void SetCursor(int16_t x, int16_t y);
 extern void SetTextColor(uint16_t c);
 extern void SetTextSize(uint8_t s);
 extern void SetTextWrap(uint8_t w);
+
+/* EFFECTS: Changes to new line */
+extern void IncrementLine();
 
 /* REQUIRES: The reset pin.
  * EFFECTS: Initializes the display pins.
