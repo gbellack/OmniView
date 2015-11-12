@@ -1,5 +1,5 @@
-#include "display_driver.h"
 #include <stdint.h>
+#include "display.h"
 
 /* This file contains the buffer that stores the image. */
 

@@ -5,6 +5,7 @@
 #define MICROPHONE_H
 
 
+extern void InitializeMicrophone();
 
 
 #endif

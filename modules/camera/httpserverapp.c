@@ -185,7 +185,7 @@ void WebSocketHandshakeEventHandler(UINT16 uConnection)
 //****************************************************************************
 
 
-void HttpServerAppTask(void * param)
+void HttpServerAppTask()
 {
 	long lRetVal = -1;
 	
