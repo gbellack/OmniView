@@ -42,7 +42,8 @@ typedef struct
 }t_mDNSService;
 
 
-extern void HttpServerAppTask(void *);
+extern void HttpServerAppTask();
+
 extern void Init3200SimpleLink ( void );
 void InitCameraComponents(int width, int height);
 

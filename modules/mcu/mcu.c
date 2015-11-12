@@ -1,26 +1,26 @@
 #include "mcu.h"
 
 
-void enterHibernateMode(void *pvParameters)
+void enterHibernateMode()
 {
 	for (;;) {
 	}
 }
 
 
-void exitHibernateMode(void *pvParameters)
+void exitHibernateMode()
 {
 	for (;;) {
 	}
 }
 
-void enterDeepSleepMode(void *pvParameters)
+void enterDeepSleepMode()
 {
 	for (;;) {
 	}
 }
 
-void exitDeepSleepMode(void *pvParameters)
+void exitDeepSleepMode()
 {
 	for (;;) {
 	}
