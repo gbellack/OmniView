@@ -39,9 +39,9 @@ uint16_t textcolor, textbgcolor;
 uint8_t textsize, rotation, wrap;
 
 void DisplayName(const char *firstName, const char *lastName) {
+	DisplayPrintLine(firstName);
 	DisplayPrint("  ");
 	DisplayPrintLine(lastName);
-	DisplayPrintLine(firstName);
 }
 
 void DisplayPrint(const char *str) {
@@ -53,11 +53,7 @@ void DisplayPrint(const char *str) {
 }
 
 void DisplayPrintLine(const char *str) {
-	int i = 0;
-	while (str[i] != '\0') {
-		PrintHelper(str[i]);
-		++i;
-	}
+	DisplayPrint(str);
 	IncrementLine();
 }
 
@@ -83,7 +79,7 @@ void PrintHelper(uint8_t c) {
 }
 
 void IncrementLine() {
-	cursor_y -= textsize*8;
+	cursor_y += textsize*8;
 	cursor_x = 0;
 }
 
@@ -453,7 +449,7 @@ void ClearDisplay() {
 	Send(0x0700); // Page end address
 
 	/* Set the cursor back to the original position */
-	SetCursor(0, SSD1306_LCDHEIGHT - textsize*8);
+	SetCursor(0, SSD1306_LCDHEIGHT/2);// - textsize*8);
 }
 
 /* EFFECTS: Displays whatever that is stored in buffer */

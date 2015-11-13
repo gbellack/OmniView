@@ -34,18 +34,18 @@ void FaceRecognitionMode(void *pvParameters) {
 	DisplayName("ZHENG HAO", "TAN");
 	DisplayName("TZU-FEI", "YU");
 	Display();
-//    UtilsDelay(8000000);
-//
-//	ClearDisplay();
-//	DisplayName("LOREN", "WANG");
-//	Display();
-//
-//    UtilsDelay(8000000);
-//
-//	ClearDisplay();
-//	DisplayName("12345678901234567890123456789012", "YU");
-//	Display();
-//
+    UtilsDelay(8000000);
+
+	ClearDisplay();
+	DisplayName("LOREN", "WANG");
+	Display();
+
+    UtilsDelay(8000000);
+
+	ClearDisplay();
+	DisplayName("12345678901234567890123456789012", "YU");
+	Display();
+
 //	HttpServerAppTask();
 
     for (;;) {
