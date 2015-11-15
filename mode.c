@@ -27,16 +27,16 @@
 
 void InitializeModules() {
 
-	I2CInit();
     UDMAInit();
     PinMuxConfig();
-
+	I2CInit();
+/*
     InitializeDisplay();
 
     ClearDisplay();
     DisplayPrintLine("Test");
     Display();
-
+*/
 	InitCameraComponents(640, 480);
 
 	//Start SimpleLink in AP Mode
