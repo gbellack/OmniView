@@ -343,15 +343,28 @@ void SetTextWrap(uint8_t w) {
   wrap = w;
 }
 
+/* EFFECTS: Clears the display. */
+void ClearDisplay() {
+
+	memset(buffer, 0, (SSD1306_LCDWIDTH*SSD1306_LCDHEIGHT/8));
+
+	Send(SSD1306_COLUMNADDR);
+	Send(0x0000);   // Column start address (0 = reset)
+	Send(0x7F00);
+
+	Send(SSD1306_PAGEADDR);
+	Send(0x0000); // Page start address (0 = reset)
+	Send(0x0700); // Page end address
+
+	/* Set the cursor back to the original position */
+	SetCursor(0, SSD1306_LCDHEIGHT - textsize*8);
+}
+
 /* EFFECTS: Initializes the I2C pins and set up the display configurations. */
 void InitializeDisplay() {
 
-	UART_PRINT("Starting Initialize Display\n\r");
-
     /* CC3200 - I2C Init to fast mode */
     I2C_IF_Open(I2C_MASTER_MODE_FST);
-
-    UART_PRINT("Opened I2C\n\r");
 
     rotation  = 0;
     cursor_y = cursor_x = 0;
@@ -437,23 +450,6 @@ void InitializeDisplay() {
 void Send(uint16_t payload) {
 
 	I2C_IF_Write(SSD1306_I2C_ADDRESS, &payload, 2, 1);
-}
-
-/* EFFECTS: Clears the display. */
-void ClearDisplay() {
-
-	memset(buffer, 0, (SSD1306_LCDWIDTH*SSD1306_LCDHEIGHT/8));
-
-	Send(SSD1306_COLUMNADDR);
-	Send(0x0000);   // Column start address (0 = reset)
-	Send(0x7F00);
-
-	Send(SSD1306_PAGEADDR);
-	Send(0x0000); // Page start address (0 = reset)
-	Send(0x0700); // Page end address
-
-	/* Set the cursor back to the original position */
-	SetCursor(0, SSD1306_LCDHEIGHT - textsize*8);
 }
 
 /* EFFECTS: Displays whatever that is stored in buffer */

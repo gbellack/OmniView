@@ -69,20 +69,8 @@ int main()
 {
     InitializeBoard();
 
-    InitializeModules();
-
-    UDMAInit();
-
-    // Configure pins.
-    PinMuxConfig();
-
-	#ifndef NOTERM
-		InitTerm();
-	    ClearTerm();
-	#endif
-
     // Creating a queue for 10 elements.
-    OsiReturnVal_e osi_retVal;
+	OsiReturnVal_e osi_retVal;
     osi_retVal = osi_MsgQCreate(&MsgQ, "MSGQ", MAX_MSG_LENGTH, 10);
     if(osi_retVal != OSI_OK)
     {
