@@ -59,7 +59,6 @@ void PinMuxConfig(void)
 	MAP_PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
 
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
-    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
 
     MAP_PRCMPeripheralClkEnable(PRCM_CAMERA, PRCM_RUN_MODE_CLK);
 
@@ -154,18 +153,4 @@ void PinMuxConfig(void)
 	// Configure PIN_01 for MODE0
 	//
 	MAP_PinTypeI2C(PIN_01, PIN_MODE_0);
-
-	// Interrupt pins.
-	//
-	// Configure PIN_04 for GPIOInput
-	//
-	MAP_PinTypeGPIO(PIN_04, PIN_MODE_0, false);
-	MAP_GPIODirModeSet(GPIOA1_BASE, 0x20, GPIO_DIR_MODE_IN);
-
-	//
-	// Configure PIN_15 for GPIOInput
-	//
-	MAP_PinTypeGPIO(PIN_15, PIN_MODE_0, false);
-	MAP_GPIODirModeSet(GPIOA2_BASE, 0x40, GPIO_DIR_MODE_IN);
-
 }

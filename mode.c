@@ -30,6 +30,7 @@ void InitializeModules() {
     UDMAInit();
     PinMuxConfig();
 	I2CInit();
+
 /*
     InitializeDisplay();
 
