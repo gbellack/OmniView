@@ -30,6 +30,11 @@ Credits to: [Texas Instruments Uniflash Wiki page](http://processors.wiki.ti.com
 8. modules/camera/camera_network.c/h: This file will implement everything to do with how the image is being sent over the network.
 9. modules/mcu/mcu.c/h: This file implements power modes for the CC3200MOD microcontroller that we are using.
 
+###Speech Recognition
+Please READ:
+1. Make sure you have PyAudio installed.
+2. All the examples are in the speech_recognition file.
+
 ###Version Control for Code Composer Studio Project
 The .gitignore file on this repository should do the trick, but please:  
   
