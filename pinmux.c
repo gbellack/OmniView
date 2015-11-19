@@ -153,4 +153,10 @@ void PinMuxConfig(void)
 	// Configure PIN_01 for MODE0
 	//
 	MAP_PinTypeI2C(PIN_01, PIN_MODE_0);
+
+
+	/* BUTTON INTERRUPTS */
+    // Configure PIN_01 for GPIOInput
+//    MAP_PinTypeGPIO(PIN_01, PIN_MODE_0, false);
+//    MAP_GPIODirModeSet(GPIOA1_BASE, GPIO_PIN_2, GPIO_DIR_MODE_IN);
 }
