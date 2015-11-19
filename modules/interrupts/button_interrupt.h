@@ -1,6 +1,11 @@
 #ifndef BUTTON_INTERRUPT_H
 #define BUTTON_INTERRUPT_H
-/* This file contains the button interrupt handlers */
+
+/* This file contains the button interrupt interface used for switching between
+ * face and speech recognition modes.
+ *
+ * Zheng Hao Tan
+ */
 
 #include <stdlib.h>
 
