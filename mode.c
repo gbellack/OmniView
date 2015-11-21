@@ -3,6 +3,9 @@
  * face recognition mode or name recording mode. */
 #include "mode.h"
 
+#include "rom_map.h"
+
+#include "rom.h"
 /* INIT INCLUDES */
 #include "pinmux.h"
 #include "udma_if.h"
@@ -20,25 +23,40 @@
 #include "modules/camera/i2cconfig.h"
 
 /* NETWORK INCLUDES */
+//JC fix: include simplelink.h
+#include "simplelink.h"
+
 #include "modules/networking/tcp_network.h"
 #include "network_if.h"
-#include "wlan.h"
 #include "common.h"
+#include "wlan.h"
+#include "utils.h"
 
 void InitializeModules() {
 
     UDMAInit();
+
+	MAP_UtilsDelay(20000);
     PinMuxConfig();
+
+	MAP_UtilsDelay(20000);
 	I2CInit();
 
-/*
-    InitializeDisplay();
+	MAP_UtilsDelay(20000);
 
-    ClearDisplay();
-    DisplayPrintLine("Test");
-    Display();
-*/
+
 	InitCameraComponents(640, 480);
+
+	MAP_UtilsDelay(20000);
+	InitializeDisplay();
+	ClearDisplay();
+	DisplayPrintLine("Test");
+	Display();
+    MAP_UtilsDelay(20000);
+
+
+
+
 
 	//Start SimpleLink in AP Mode
     long lRetVal = -1;

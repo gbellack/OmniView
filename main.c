@@ -35,6 +35,8 @@
 #define SPAWN_TASK_PRIORITY     9
 #define MAX_MSG_LENGTH 16
 
+
+
 /* TODO: Handle priorities */
 #define FACE_RECOGNITION_TASK_NAME "FaceRecognitionTask"
 #define FACE_RECOGNITION_TASK_STACK_SIZE 2048
@@ -79,6 +81,10 @@ int main()
     }
 
 	long lRetVal = -1;
+
+
+    //this guy is stupid...
+
 
 	// Start the SimpleLink Host
 	lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);

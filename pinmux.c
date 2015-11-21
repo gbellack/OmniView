@@ -50,7 +50,8 @@
 #include "rom_map.h"
 #include "gpio.h"
 #include "prcm.h"
-
+#define GPIO9 0x02
+#define GPIO9PIN PIN_64
 //*****************************************************************************
 void PinMuxConfig(void)
 {
@@ -64,10 +65,14 @@ void PinMuxConfig(void)
 
     MAP_PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
 
+    //gpio 13
+	//MAP_PinTypeGPIO(PIN_04 , PIN_MODE_0, false);
+    //GPIODirModeSet(GPIOA1_BASE, 0x20 ,GPIO_DIR_MODE_OUT);
+
 	//
 	// Configure PIN_55 for UART0 UART0_TX
 	//
-	MAP_PinTypeUART(PIN_55, PIN_MODE_3);
+	//MAP_PinTypeUART(PIN_55, PIN_MODE_3);
 
 	//
 	// Configure PIN_57 for UART0 UART0_RX
@@ -75,7 +80,9 @@ void PinMuxConfig(void)
 	MAP_PinTypeUART(PIN_57, PIN_MODE_3);
 
 	/* DISPLAY */
-    MAP_PinTypeGPIO(PIN_05, PIN_MODE_0, false);
+    MAP_PinTypeGPIO(GPIO9PIN , PIN_MODE_0, false);
+    GPIODirModeSet(GPIOA1_BASE, GPIO9 ,GPIO_DIR_MODE_OUT);
+
 
 	/* CAMERA */
 
@@ -142,13 +149,24 @@ void PinMuxConfig(void)
 	//
 	// Configure PIN_16 for I2C0 I2C_SCL
 	//
-	MAP_PinTypeI2C(PIN_16, PIN_MODE_9);
+	//MAP_PinTypeI2C(PIN_16, PIN_MODE_9);
 
+	PinModeSet(PIN_16,PIN_MODE_9);
+
+	    //
+	    // Set the pin for open-drain operation with a weak pull-up.
+	    //
+	PinConfigSet(PIN_16,PIN_STRENGTH_6MA,PIN_TYPE_OD_PU);
 	//
 	// Configure PIN_17 for I2C0 I2C_SDA
 	//
-	MAP_PinTypeI2C(PIN_17, PIN_MODE_9);
+	//MAP_PinTypeI2C(PIN_17, PIN_MODE_9);
+	PinModeSet(PIN_17,PIN_MODE_9);
 
+	    //
+	    // Set the pin for open-drain operation with a weak pull-up.
+	    //
+	PinConfigSet(PIN_17,PIN_STRENGTH_6MA,PIN_TYPE_OD_PU);
 	//
 	// Configure PIN_01 for MODE0
 	//

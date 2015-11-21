@@ -32,7 +32,8 @@
 #include "i2c_if.h"
 
 #define UART_PRINT Report
-
+//clock is 80 MHz, takes 3 cycles/loop
+#define MILS_DELAY(x) (80000*x/6)
 // GFX variables.
 int16_t cursor_x, cursor_y;
 uint16_t textcolor, textbgcolor;
@@ -352,25 +353,25 @@ void InitializeDisplay() {
     wrap = 1;
 
 	// Power on sequence.
-	#ifdef RESET_I2C_DISPLAY_PIN
+	//#ifdef RESET_I2C_DISPLAY_PIN
 
 		/* Set RESET PIN to high for GPIO output. */
-		GPIOPinWrite(GPIOA1_BASE, DISPLAY_RESET_PIN, 1);
+		GPIOPinWrite(GPIOA1_BASE, DISPLAY_RESET_PIN, 0xFF);
 
 		// TODO - Figure out delays (might need freeRTOS implementation here)...
 		// VDD (3.3V) goes high at start, lets just chill for a ms
-    	UtilsDelay(10000);
+    	UtilsDelay(MILS_DELAY(1));
 
 		/* Bring reset low */
 		GPIOPinWrite(GPIOA1_BASE, DISPLAY_RESET_PIN, 0);
 
 		// wait 10ms
-        MAP_UtilsDelay(100000);
+        MAP_UtilsDelay(MILS_DELAY(10));
 
 		// bring out of reset
-		GPIOPinWrite(GPIOA1_BASE, DISPLAY_RESET_PIN, 1);
+		GPIOPinWrite(GPIOA1_BASE, DISPLAY_RESET_PIN, 0xFF);
 
-	#endif
+	//#endif
 
 	/* Init sequence for 128x64 OLED module */
 	Send(SSD1306_DISPLAYOFF);                    // 0xAE
@@ -476,6 +477,8 @@ void Display() {
 /* EFFECTS: Turns the display on. */
 void DisplayOn() {
 	Send(SSD1306_DISPLAYON);
+	//SSD datasheet 8.9 says something about COM being stable 100ms after turning display on
+    MAP_UtilsDelay(MILS_DELAY(100));
 }
 
 /* EFFECTS: Turns off the display. */

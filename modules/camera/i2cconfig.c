@@ -87,9 +87,10 @@ unsigned long I2CInit()
     MAP_PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralReset(PRCM_I2CA0);
 
-    // Configure I2C module, 400 Kbps fast mode 
+    // Configure I2C module, 400 Kbps slow mode
     MAP_I2CMasterInitExpClk(I2CA0_BASE,80000000,false);
     //  MAP_I2CMasterDisable(I2CA0_BASE);
+    I2CMasterGlitchFilterConfigSet(I2CA0_BASE , I2C_MASTER_GLITCH_FILTER_8);
 
     return 0;
 }
