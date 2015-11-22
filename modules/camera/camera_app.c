@@ -298,8 +298,10 @@ unsigned short StartCamera(char **WriteBuffer)
 
 void InitCameraComponents(int width, int height)
 {
+	/*
     PinMuxConfig();
     I2CInit();
+	*/
 
     //
     // Initialize camera controller

@@ -35,28 +35,11 @@
 void InitializeModules() {
 
     UDMAInit();
-
-	MAP_UtilsDelay(20000);
     PinMuxConfig();
-
-	MAP_UtilsDelay(20000);
 	I2CInit();
 
-	MAP_UtilsDelay(20000);
-
-
 	InitCameraComponents(640, 480);
-
-	MAP_UtilsDelay(20000);
 	InitializeDisplay();
-	ClearDisplay();
-	DisplayPrintLine("Test");
-	Display();
-    MAP_UtilsDelay(20000);
-
-
-
-
 
 	//Start SimpleLink in AP Mode
     long lRetVal = -1;
@@ -70,7 +53,7 @@ void InitializeModules() {
 void FaceRecognitionMode(void *pvParameters) {
 
 	InitializeModules();
-    int sockID = InitTcpServer(5001);
+	int sockID = InitTcpServer(5001);
 
     while(1) {
     	int bufSize = 100; // big enough buffer
