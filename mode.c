@@ -31,6 +31,7 @@
 #include "common.h"
 #include "wlan.h"
 #include "utils.h"
+#include "datatypes.h"
 
 void InitializeModules() {
 
@@ -38,8 +39,9 @@ void InitializeModules() {
     PinMuxConfig();
 	I2CInit();
 
-	InitCameraComponents(640, 480);
+
 	InitializeDisplay();
+	InitCameraComponents(640, 480);
 
 	//Start SimpleLink in AP Mode
     long lRetVal = -1;
@@ -53,18 +55,51 @@ void InitializeModules() {
 void FaceRecognitionMode(void *pvParameters) {
 
 	InitializeModules();
+
+	short count = 0;
+
+	// THIS LOOP DOESN'T CRASH (NO NETWORKING)
+/*
+	while(1){
+	    int             picSize;
+	    UINT8* 			picData;
+	    picSize = StartCamera((char **)&picData);
+
+    	char countString[10];
+    	int stringLen;
+
+    	ClearDisplay();
+    	stringLen = itoa(count, countString);
+    	countString[stringLen] = '\0';
+    	DisplayPrintLine(countString);
+    	Display();
+
+    	count++;
+	}
+*/
+
 	int sockID = InitTcpServer(5001);
 
     while(1) {
     	int bufSize = 100; // big enough buffer
     	char stringBuf[bufSize];
+    	char countString[10];
+    	int stringLen;
 
     	TakeAndSendPicture(sockID);
     	RecieveString(sockID, stringBuf, bufSize);
 
-    	ClearDisplay();
-    	DisplayPrintLine(stringBuf);
-    	Display();
+    	//ClearDisplay();
+    	//DisplayPrintLine(stringBuf);
+
+    	//stringLen = itoa(count, countString);
+    	//countString[stringLen] = '\0';
+
+    	//DisplayPrintLine(countString);
+    	//Display();
+
+    	count++;
+    	MAP_UtilsDelay(100000);
     }
 }
 

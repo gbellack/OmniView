@@ -21,6 +21,8 @@
 #include "datatypes.h"
 #include "common.h"
 
+/* DISPLAY INCLUDES */
+#include "../display/display.h"
 
 // Application specific status/error codes
 typedef enum{
@@ -140,7 +142,17 @@ void TakeAndSendPicture(int sockID) {
     int             numBytes;
     int				numBytesTotal = 0;
 
+    // TODO: REMOVE LATER
+    ClearDisplay();
+    DisplayPrintLine("Begin take picture");
+    Display();
+
 	picSize = StartCamera((char **)&picData);
+
+    // TODO: REMOVE LATER
+    ClearDisplay();
+    DisplayPrintLine("Begin send picture");
+    Display();
 
 	// Send picSize
 	numBytes = sl_Send(sockID, (void*)&picSize, sizeof(int), 0);
@@ -160,16 +172,38 @@ void TakeAndSendPicture(int sockID) {
 	    }
 	    numBytesTotal += numBytes;
 	}
+
+    // TODO: REMOVE LATER
+    ClearDisplay();
+    DisplayPrintLine("Sent picture");
+    Display();
 }
 
 void RecieveString(int sockID, char* stringBuf, int bufSize) {
+
+	//TODO: REMOVE LATER
+    ClearDisplay();
+    DisplayPrintLine("Begin recv string");
+    Display();
+
+    // ALWAYS CRASHES BETWEEN THESE DISPLAY PRINTS
+    // SERVER SAYS IT SENT THE STRING
+    // BUT A DELAY BEFORE SERVER SENDS THE STRING DID NOT FIX THE ISSUE
 	int numBytes = sl_Recv(sockID, stringBuf, bufSize, 0);
 	if( numBytes <= 0 ) {
 		sl_Close(sockID);
 	    LOOP_FOREVER();
 	}
-
+	else if( numBytes >= bufSize - 1) {
+		sl_Close(sockID);
+		LOOP_FOREVER();
+	}
 	stringBuf[numBytes] = '\0';
+
+	//TODO: REMOVE LATER
+    ClearDisplay();
+    DisplayPrintLine("Got string");
+    Display();
 }
 
 
