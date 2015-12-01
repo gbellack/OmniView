@@ -22,6 +22,12 @@
 #include "gpio.h"
 #include "pin.h"
 
+//Display includes
+#include "utils.h"
+#include "rom_map.h"
+#include "rom.h"
+#include "../display/display.h"
+
 uint8_t toggleFaceRecognitionMode = 0; /* Toggle mode between face and speech recognition */
 
 volatile uint8_t count = 0;
@@ -49,17 +55,25 @@ static void ButtonPressIntHandler(void)
     MAP_GPIOIntClear(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
     MAP_IntDisable(INTERRUPT_BUTTON_GPIO_HW_INT);
 
-	/* OmniView Modes */
+
+    ClearDisplay();
+    DisplayPrintLine("Button Pressed");
+    Display();
+    MAP_UtilsDelay(1000000);
+
+/*
+	// OmniView Modes
 	if (toggleFaceRecognitionMode)
 	{
 //		task1();
 		toggleFaceRecognitionMode = 0;
 	}
-	else /* Speech recognition mode */
+	else // Speech recognition mode
 	{
 //		task2();
 		toggleFaceRecognitionMode = 1;
 	}
+*/
 
 	/* Enable GPIO Interrupt */
 	MAP_GPIOIntClear(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
