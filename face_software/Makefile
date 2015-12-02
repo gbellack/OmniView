@@ -18,7 +18,7 @@ CXXFLAGS      = -m64 -pipe -O2 -Wall -W -D_REENTRANT -fPIE $(DEFINES)
 INCPATH       = -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I. -I/usr/local/include -I/usr/include/qt5 -I/usr/include/qt5/QtWidgets -I/usr/include/qt5/QtGui -I/usr/include/qt5/QtCore -I.
 LINK          = g++
 LFLAGS        = -m64 -Wl,-O1
-LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -L/usr/local/lib -lopenbr -lopencv_core -lQt5Widgets -L/usr/lib/x86_64-linux-gnu -l:libjpeg.so.8 -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/usr/X11R6/lib64 -L/usr/local/lib -lopenbr -lopencv_core -lQt5Widgets -L/usr/lib/x86_64-linux-gnu -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
@@ -45,8 +45,10 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = faceRec.cpp 
-OBJECTS       = faceRec.o
+SOURCES       = faceRec.cpp \
+		tcpClient.cpp 
+OBJECTS       = faceRec.o \
+		tcpClient.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -135,12 +137,11 @@ first: all
 
 ####### Build rules
 
-
 all: Makefile $(TARGET) faceRec
 
 faceRec: faceRec.o
-	$(LINK) faceRec.o -o faceRec $(LFLAGS) $(LIBS)
-	
+	$(LINK) faceRec.o tcpClient.o -g -o faceRec $(LFLAGS) $(LIBS)
+
 $(TARGET):  $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -278,11 +279,11 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/make1.0.0 || mkdir -p .tmp/make1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/make1.0.0/ && $(COPY_FILE) --parents faceRec.cpp .tmp/make1.0.0/ && (cd `dirname .tmp/make1.0.0` && $(TAR) make1.0.0.tar make1.0.0 && $(COMPRESS) make1.0.0.tar) && $(MOVE) `dirname .tmp/make1.0.0`/make1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/make1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/make1.0.0/ && $(COPY_FILE) --parents faceRec.cpp tcpClient.cpp .tmp/make1.0.0/ && (cd `dirname .tmp/make1.0.0` && $(TAR) make1.0.0.tar make1.0.0 && $(COMPRESS) make1.0.0.tar) && $(MOVE) `dirname .tmp/make1.0.0`/make1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/make1.0.0
 
 
 clean:compiler_clean 
-	-$(DEL_FILE) $(OBJECTS)
+	-$(DEL_FILE) $(OBJECTS) faceRec
 	-$(DEL_FILE) *~ core *.core
 
 
@@ -433,8 +434,32 @@ faceRec.o: faceRec.cpp openbr/openbr_plugin.h \
 		/usr/local/include/opencv2/core/mat.hpp \
 		/usr/local/include/openbr/openbr.h \
 		/usr/local/include/openbr/openbr_export.h \
-		/usr/local/include/openbr/universal_template.h
+		/usr/local/include/openbr/universal_template.h \
+		openbr/plugins/openbr_internal.h \
+		openbr/core/resource.h \
+		/usr/include/qt5/QtCore/QMutex \
+		/usr/include/qt5/QtCore/QSemaphore \
+		/usr/include/qt5/QtCore/qsemaphore.h \
+		/usr/include/qt5/QtGui/QImage \
+		/usr/include/qt5/QtGui/qimage.h \
+		/usr/include/qt5/QtGui/qtransform.h \
+		/usr/include/qt5/QtGui/qmatrix.h \
+		/usr/include/qt5/QtGui/qpolygon.h \
+		/usr/include/qt5/QtGui/qregion.h \
+		/usr/include/qt5/QtGui/qwindowdefs.h \
+		/usr/include/qt5/QtGui/qwindowdefs_win.h \
+		/usr/include/qt5/QtCore/qline.h \
+		/usr/include/qt5/QtGui/qpainterpath.h \
+		/usr/include/qt5/QtGui/qpaintdevice.h \
+		/usr/include/qt5/QtGui/qrgb.h \
+		/usr/include/qt5/QtGui/QColor \
+		/usr/include/qt5/QtGui/qcolor.h \
+		/usr/include/qt5/QtCore/QIODevice \
+		tcpClient.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o faceRec.o faceRec.cpp
+
+tcpClient.o: tcpClient.cpp tcpClient.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcpClient.o tcpClient.cpp
 
 ####### Install
 

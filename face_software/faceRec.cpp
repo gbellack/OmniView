@@ -8,21 +8,63 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <cmath>
+#include <math.h>
+#include <boost/timer.hpp>
+#include <time.h>
 
+#include <tcpClient.h>
+
+#define LOWER_BOUND 0.5
+#define max_size 100
 using namespace std;
 using namespace br;
 
 
 /******************* TO DO******************
 
-1)Change for jpeg? depending on camera's ability to format
-2)finish blobbing
+1) Adds name of people it does not recognize
 
 *////////////////////////////////////////
 
 string file_glob;
+int sock; 
+int mode;
+
+
+
+void extractName(double score, QString file_input){
+    if(score >= LOWER_BOUND){
+        string file = file_input.toStdString();
+        int first = 0;
+        int second = 0;
+
+        for(int i = file.size() - 1; i >= 0 ; i--){
+            if(file[i] == '/'){
+                if (first == 0){
+                    first = i;
+                }
+                else{
+                    second = i;
+                    break;
+                }
+            }
+        }
+
+        cout << "Face recognized as: " << file.substr(second+1, first-second-1) << endl;
+        cout << endl;
+
+        sendString(sock,file.substr(second+1, first-second-1));
+    }
+    else{
+        cout << "Unable to recognize face" << endl;
+        sendString(sock,"Unable to recognize face");
+    }
+
+}
+
 
 int calcDistance(const br::Template &t)
 {
@@ -64,7 +106,7 @@ void blackblob(const br::Template &t){
     QRgb value;
     value = qRgb(0,0,0);
     //loop through x
-    for(int i = top_x ; i < bottom_x; i ++){
+    for(double i = top_x ; i < bottom_x; i++){
         //loop through y
         for(int j = top_y; j < bottom_y; j++){
             //cout << "loop";
@@ -75,131 +117,197 @@ void blackblob(const br::Template &t){
     }
 
     image.save(fileName, 0,100); // writes image into ba in PNG format
-
-
 }
-
-void define (){
-    // Globals->abbreviations.insert("FaceRecognition2", "FaceRecognition_1_12");
-
-
-    // Globals->abbreviations.insert("FaceRecognition_1_12", "FR_Detect2+(FR_Eyes+FR_Represent)/(FR_Eyebrows+FR_Represent)/(FR_Mouth+FR_Represent)/(FR_Nose+FR_Represent)/(FR_Face+FR_Represent+ScaleMat(2.0))+Cat+LDA(768)+Normalize(L2):Unit(Dist(L2))");
-    // Globals->abbreviations.insert("FR_Detect2", "(FaceDetection2+ASEFEyes+Affine(136,136,0.35,0.35,warpPoints=true))");
-    // Globals->abbreviations.insert("FaceDetection2", "Open+Cvt(Gray)");
-    
-
-}
-//dunno if necessary
-void train(){
-
-
-    const QString trainedModelFile = "FaceRecognitionLab";
-    //Globals->algorithm = "FR_Detect+(FR_Eyes+FR_Represent)/(FR_Eyebrows+FR_Represent)/(FR_Mouth+FR_Represent)/(FR_Nose+FR_Represent)/(FR_Face+FR_Represent+ScaleMat(2.0))+Cat+LDA(768)+Normalize(L2):Unit(Dist(L2))";
-    Globals->algorithm = "FaceRecognition";
-    if (!QFile(trainedModelFile).exists()){
-         const QString trainingData = "data/training";
-        printf("Note: Training will take at least a few minutes to complete.\n");
-        br::Train(trainingData, trainedModelFile);
-    }
-    cout << "done training" << endl;
-}
-
 
 
 int main(int argc, char *argv[]) {
     br::Context::initialize(argc, argv);
 
-    train();
-
     // Retrieve classes for enrolling and comparing templates using the FaceRecognition algorithm
-    //QSharedPointer<br::Transform> transform = br::Transform::fromAlgorithm("FaceRecognition");
-    
     QSharedPointer<br::Transform> transform = br::Transform::fromAlgorithm("FaceRecognition");
     QSharedPointer<br::Distance> distance = br::Distance::fromAlgorithm("FaceRecognition");
 
-
-    // Initialize templates
-    br::TemplateList target = br::TemplateList::fromGallery("testPics");
-    cout << "Input pic name:" << endl;
-    cin >> file_glob;
-    br::Template query(file_glob.c_str());
-    br::TemplateList queryList;
-    queryList.push_back(query);
-
-    cout << "before" << queryList.size() << endl;
-    
-
-    // Enroll templates
-    br::Globals->enrollAll = false; // Enroll 0 or more faces per image
+    //enroll gallery
+    br::TemplateList target = br::TemplateList::fromGallery("training");
+    br::Globals->enrollAll = false; //Enroll exactly one face per image 
     target >> *transform;
-    br::Globals->enrollAll = true; // Enroll exactly one face per image
-    queryList >> *transform;
+    //cout << "Input pic name:" << endl;
+    //cin >> file_glob;
+    mode = 0;
 
-    cout << "after " << queryList.size() << endl;
+    //Init socket
+    initSocket(sock);
 
-    // Compare first face
-    QList<float> scores = distance->compare(target, queryList[0]);
-    for (int j = 0; j < scores.size(); j++) {
-    // Print an example score
-        printf("Images %s and %s have a match score of %.3f\n",
-               qPrintable(target[j].file.name),
-               qPrintable(queryList[0].file.name),
-               scores[j]);
+    while(1){
+        recvImage(sock);
+        cout << "finished receiving image" << endl;
 
-    }
-    cout << endl;
-    int size = queryList.size();
+        //image detection mode
+        if(mode == 0){
+            cout << "in image mode" << endl;
+            // double elapsed_time1 = t1.elapsed();
+            //cout << " diff time in seconds: " << elapsed_time1 << endl;
 
-    //enter loop if there are multiple faces to loop through.
-    for(int z = 1; z< size; z++){
+            //boost::timer t;
+            //Initialize test templates
+            file_glob = "query.jpg";
+            br::Template query(file_glob.c_str());
+            br::TemplateList queryList;
+            queryList.push_back(query);
 
-        //remove face that was just compared
-        if(queryList.size() > 1){
+            cout << "before transform: " << queryList.size() << endl;
+            
 
-            int template_number = 0;
-            int smallest = calcDistance(queryList[0]);
-            //since templates contain same eyes but different face,
-            // need to find face associated with the same pair of eyes to remove
-            for(int i =1; i < queryList.size(); i++){
-                int dis = calcDistance(queryList[i]);
-                if(dis < smallest){
-                    smallest = dis;
-                    template_number = i;
-                }
+            // Enroll target templates
+            br::Globals->enrollAll = true; // Enroll 0 or more faces per image
+            queryList >> *transform;
+
+
+            cout << "after transform: " << queryList.size() << endl;
+
+            /*
+            //if multiple faces
+            if(queryList.size() > 1){
+                string comms = "convert query.jpg query.png"
+                system(comms.c_str());
+                file_glob = "query.png";
+                br::Template query(file_glob.c_str());
+                queryList.pop_front();
+                queryList.push_back(query);
             }
-            cout << "template_number: " << template_number << endl;
-            blackblob(queryList[template_number]);
+            */
+
+            double best_score = -100;
+            QString filepath;
+            if( queryList.size() >= 1 ){
+
+                // Compare first face
+                QList<float> scores = distance->compare(target, queryList[0]);
+                for (int j = 0; j < scores.size(); j++) {
+                // Print an example score
+                    // printf("Images %s and %s have a match score of %.3f\n",
+                    //        qPrintable(target[j].file.name),
+                    //        qPrintable(queryList[0].file.name),
+                    //        scores[j]);
+                    if(scores[j] > best_score){
+                        best_score = scores[j];
+                        filepath = target[j].file.name;
+                    }
+
+                }
+                extractName(best_score, filepath);
+            }
+            else{
+                cout << "No face detected" << endl;
+                sendString(sock,"No face detected");
+            }
+
+            //double elapsed_time = t.elapsed();
+            //cout << " diff time in seconds: " << elapsed_time << endl;
+
+            int size = queryList.size();
+            //enter loop if there are multiple faces to loop through.
+            for(int z = 1; z< size; z++){
+                /*
+                //remove face that was just compared
+                if(queryList.size() > 1){
+
+                    int template_number = 0;
+                    int smallest = calcDistance(queryList[0]);
+                    //since templates contain same eyes but different face,
+                    // need to find face associated with the same pair of eyes to remove
+                    for(int i =1; i < queryList.size(); i++){
+                        int dis = calcDistance(queryList[i]);
+                        if(dis < smallest){
+                            smallest = dis;
+                            template_number = i;
+                        }
+                    }
+                    cout << "template_number: " << template_number << endl;
+                    blackblob(queryList[template_number]);
+                }
+
+                //enroll new image with removed face
+                br::Template query(file_glob.c_str());
+                queryList.clear();
+                queryList.push_back(query);
+
+                cout << "before" << queryList.size() << endl;
+
+
+                // Enroll templates
+                br::Globals->enrollAll = false; // Enroll 0 or more faces per image
+                target >> *transform;
+                br::Globals->enrollAll = true; // Enroll exactly one face per image
+                queryList >> *transform;
+
+                cout << "after " << queryList.size() << endl;
+
+
+                // Compare templates
+                best_score = -100;
+
+                QList<float> scores = distance->compare(target, queryList[0]);
+                for (int j = 0; j < scores.size(); j++) {
+                // Print an example score
+                    printf("Images %s and %s have a match score of %.3f\n",
+                           qPrintable(target[j].file.name),
+                           qPrintable(queryList[0].file.name),
+                           scores[j]);
+                    if(scores[j] > best_score){
+                        best_score = scores[j];
+                        filepath = target[j].file.name;
+                    }
+                }
+                extractName(best_score,filepath);
+                */
+            }
+
         }
+        //mic/speech mode
+        else{
+            FILE *fp;
+            char name[max_size];
+            int status;
 
-        //enroll new image with removed face
-        br::Template query(file_glob.c_str());
-        queryList.clear();
-        queryList.push_back(query);
+            //convert raw file to wav
+            string com1 = "sox sound.raw sound.wav";
+            system(com1.c_str());
 
-        cout << "before" << queryList.size() << endl;
+            //calls python script to find name -> name stored into name
+            fp = popen("python ./wav_transcribe.py", "r");
 
+            while (fgets(name, max_size, fp) != NULL)
+                //printf("%s", name);
 
-        // Enroll templates
-        br::Globals->enrollAll = false; // Enroll 0 or more faces per image
-        target >> *transform;
-        br::Globals->enrollAll = true; // Enroll exactly one face per image
-        queryList >> *transform;
+            status = pclose(fp);
+            
 
-        cout << "after " << queryList.size() << endl;
+            //check if person exists
+            //creates new folder for that person
+            string folder = "/home/loren/Docuements/Mich/eecs473/OmniView/face_software/training/";
+            folder.append(name);
+            
+            
+            string command = "mkdir ";
+            command.append(folder);
+            system(command.c_str());
 
+            //receives picture
+            recvImage(sock);
 
-        // Compare templates
-        QList<float> scores = distance->compare(target, queryList[0]);
-        for (int j = 0; j < scores.size(); j++) {
-        // Print an example score
-            printf("Images %s and %s have a match score of %.3f\n",
-                   qPrintable(target[j].file.name),
-                   qPrintable(queryList[0].file.name),
-                   scores[j]);
+            //renames pic and inserts into folder
+            command = "mv query.jpg ";
+            command.append(folder);
+            command.append("0.jpg");
+            system(command.c_str());
+
+            //reenroll gallery
+            target = br::TemplateList::fromGallery("training");
+            br::Globals->enrollAll = false; //Enroll exactly one face per image 
+            target >> *transform;
 
         }
-        cout << endl;
-        
 
     }
     br::Context::finalize();
