@@ -42,6 +42,9 @@ typedef enum{
     STATUS_CODE_MAX = -0xBB8
 }e_AppStatusCodes;
 
+#define QUERY_REQUEST 0xDEADBEEF
+#define ADD_REQUEST   0xDEADD00D
+
 //****************************************************************************
 //
 //! \brief Opening a TCP server side socket and receiving data
@@ -129,6 +132,14 @@ int InitTcpServer(unsigned short port)
         }
     }
 
+    // setting socket option to make the socket as non blocking
+    numBytes = sl_SetSockOpt(iNewSockID, SL_SOL_SOCKET, SL_SO_NONBLOCKING,
+                                &lNonBlocking, sizeof(lNonBlocking));
+    if( numBytes < 0 ) {
+    	sl_Close(iNewSockID);
+    	ASSERT_ON_ERROR(SOCKET_OPT_ERROR);
+    }
+
     // close the listening socket
     numBytes = sl_Close(iSockID);
     ASSERT_ON_ERROR(numBytes);
@@ -137,22 +148,22 @@ int InitTcpServer(unsigned short port)
 }
 
 void TakeAndSendPicture(int sockID) {
-    int             picSize;
     UINT8* 			picData;
     int             numBytes;
     int				numBytesTotal = 0;
 
-    // TODO: REMOVE LATER
-    ClearDisplay();
-    DisplayPrintLine("Begin take picture");
-    Display();
+    int flag = QUERY_REQUEST;
 
-	picSize = StartCamera((char **)&picData);
+	// Send flag for facial query
+	numBytes = sl_Send(sockID, (void*)&flag, sizeof(int), 0);
+	if( numBytes < 0 ) {
+		sl_Close(sockID);
+		LOOP_FOREVER();
+	}
 
-    // TODO: REMOVE LATER
-    ClearDisplay();
-    DisplayPrintLine("Begin send picture");
-    Display();
+	// Requires small delay between sequential sends
+	int picSize = StartCamera((char **)&picData);
+	//MAP_UtilsDelay(100000);
 
 	// Send picSize
 	numBytes = sl_Send(sockID, (void*)&picSize, sizeof(int), 0);
@@ -172,102 +183,19 @@ void TakeAndSendPicture(int sockID) {
 	    }
 	    numBytesTotal += numBytes;
 	}
-
-    // TODO: REMOVE LATER
-    ClearDisplay();
-    DisplayPrintLine("Sent picture");
-    Display();
 }
 
 void RecieveString(int sockID, char* stringBuf, int bufSize) {
 
-	//TODO: REMOVE LATER
-    ClearDisplay();
-    DisplayPrintLine("Begin recv string");
-    Display();
+	int numBytes;
+	int count = 0;
+	do {
+		if (count == 10000) {
+			break;
+		}
+		 numBytes = sl_Recv(sockID, stringBuf, bufSize, 0);
+		 count++;
+	} while(numBytes <= 0);
 
-    // ALWAYS CRASHES BETWEEN THESE DISPLAY PRINTS
-    // SERVER SAYS IT SENT THE STRING
-    // BUT A DELAY BEFORE SERVER SENDS THE STRING DID NOT FIX THE ISSUE
-	int numBytes = sl_Recv(sockID, stringBuf, bufSize, 0);
-	if( numBytes <= 0 ) {
-		sl_Close(sockID);
-	    LOOP_FOREVER();
-	}
-	else if( numBytes >= bufSize - 1) {
-		sl_Close(sockID);
-		LOOP_FOREVER();
-	}
 	stringBuf[numBytes] = '\0';
-
-	//TODO: REMOVE LATER
-    ClearDisplay();
-    DisplayPrintLine("Got string");
-    Display();
 }
-
-
-
-/*
-    // Get picSize
-    numBytes = sl_Recv(iNewSockID, imageBuf, BUF_SIZE, 0);
-    if( numBytes <= 0 ) {
-    	sl_Close(iNewSockID);
-    	ASSERT_ON_ERROR(RECV_ERROR);
-    }
-    picSize = *(int*)imageBuf;
-
-    // Recv pic into buffer
-    while(numBytesTotal != picSize) {
-    	numBytes = sl_Recv(iNewSockID, &imageBuf[numBytesTotal],
-    			BUF_SIZE-numBytesTotal, 0);
-    	if( numBytes <= 0 ) {
-    	    sl_Close(iNewSockID);
-    	    ASSERT_ON_ERROR(RECV_ERROR);
-    	}
-    	numBytesTotal += numBytes;
-    }
-
-    // Send picSize
-    numBytes = sl_Send(iNewSockID, (void*)&picSize, sizeof(int), 0);
-    if( numBytes < 0 )
-    {
-        sl_Close(iSockID);
-        ASSERT_ON_ERROR(SEND_ERROR);
-    }
-
-    // Send pic
-    numBytesTotal = 0;
-    while(numBytesTotal != picSize) {
-    	numBytes = sl_Send(iNewSockID, &imageBuf[numBytesTotal],
-    			picSize-numBytesTotal, 0);
-    	if( numBytes < 0 )
-    	{
-    		sl_Close(iSockID);
-    	    ASSERT_ON_ERROR(SEND_ERROR);
-    	}
-    	numBytesTotal += numBytes;
-    }
-
-    // Recieve string
-    numBytes = sl_Recv(iNewSockID, imageBuf, BUF_SIZE, 0);
-    if( numBytes <= 0 ) {
-    	sl_Close(iNewSockID);
-    	ASSERT_ON_ERROR(RECV_ERROR);
-    }
-
-    // Send back string
-    numBytes = sl_Send(iNewSockID, imageBuf, numBytes, 0);
-    if( numBytes <= 0 ) {
-    	sl_Close(iNewSockID);
-    	ASSERT_ON_ERROR(SEND_ERROR);
-    }
-
-    // close the connected socket after receiving from connected TCP client
-    numBytes = sl_Close(iNewSockID);
-    ASSERT_ON_ERROR(numBytes);
-
-    return SUCCESS;
-}
-*/
-

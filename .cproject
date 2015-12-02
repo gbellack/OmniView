@@ -88,12 +88,13 @@
 									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/driverlib/ccs/Release/driverlib.a&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.SEARCH_PATH.118885018" name="Add &lt;dir&gt; to library search path (--search_path, -i)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.SEARCH_PATH" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/driverlib/ccs/Release&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/oslib/ccs/free_rtos&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/simplelink/ccs/OS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${CC3200_SDK_ROOT}/netapps/http/server/ccs/Release&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${CG_TOOL_ROOT}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.5/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/CC3200SDK_1.1.0/cc3200-sdk/driverlib/ccs/Release&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/CC3200SDK_1.1.0/cc3200 -sdk/third_party/FreeRTOS/source/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/CC3200SDK_1.1.0/cc3200-sdk/oslib/ccs/free_rtos&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/CC3200SDK_1.1.0/cc3200-sdk/simplelink/ccs/OS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/CC3200SDK_1.1.0/cc3200-sdk/netapps/http/server/ccs/Release&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.5/include&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.DISPLAY_ERROR_NUMBER.1017129894" name="Emit diagnostic identifier numbers (--display_error_number)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.DIAG_WRAP.1535115799" name="Wrap diagnostic messages (--diag_wrap)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.DIAG_WRAP" value="com.ti.ccstudio.buildDefinitions.TMS470_5.2.linkerID.DIAG_WRAP.off" valueType="enumerated"/>

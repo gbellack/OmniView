@@ -22,6 +22,9 @@
 #include "modules/camera/camera_app.h"
 #include "modules/camera/i2cconfig.h"
 
+/* INTERRUPT INCLUDES */
+#include "modules/interrupts/button_interrupt.h"
+
 /* NETWORK INCLUDES */
 //JC fix: include simplelink.h
 #include "simplelink.h"
@@ -39,7 +42,7 @@ void InitializeModules() {
     PinMuxConfig();
 	I2CInit();
 
-
+	InitializeInterrupts();
 	InitializeDisplay();
 	InitCameraComponents(640, 480);
 
@@ -55,51 +58,37 @@ void InitializeModules() {
 void FaceRecognitionMode(void *pvParameters) {
 
 	InitializeModules();
-
-	short count = 0;
-
-	// THIS LOOP DOESN'T CRASH (NO NETWORKING)
-/*
-	while(1){
-	    int             picSize;
-	    UINT8* 			picData;
-	    picSize = StartCamera((char **)&picData);
-
-    	char countString[10];
-    	int stringLen;
-
-    	ClearDisplay();
-    	stringLen = itoa(count, countString);
-    	countString[stringLen] = '\0';
-    	DisplayPrintLine(countString);
-    	Display();
-
-    	count++;
-	}
-*/
-
 	int sockID = InitTcpServer(5001);
 
+	short count = 0;
     while(1) {
     	int bufSize = 100; // big enough buffer
     	char stringBuf[bufSize];
     	char countString[10];
     	int stringLen;
 
+    	// Disable Button Interrupt
+        MAP_GPIOIntDisable(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
+        MAP_IntDisable(INTERRUPT_BUTTON_GPIO_HW_INT);
+
     	TakeAndSendPicture(sockID);
     	RecieveString(sockID, stringBuf, bufSize);
 
-    	//ClearDisplay();
-    	//DisplayPrintLine(stringBuf);
+    	ClearDisplay();
+    	DisplayPrintLine(stringBuf);
 
-    	//stringLen = itoa(count, countString);
-    	//countString[stringLen] = '\0';
+    	stringLen = itoa(count, countString);
+    	countString[stringLen] = '\0';
 
-    	//DisplayPrintLine(countString);
-    	//Display();
+    	DisplayPrintLine(countString);
+    	Display();
+
+    	// Enable Button Interrupt
+    	MAP_IntEnable(INTERRUPT_BUTTON_GPIO_HW_INT);
+    	MAP_GPIOIntEnable(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
 
     	count++;
-    	MAP_UtilsDelay(100000);
+    	//MAP_UtilsDelay(100000);
     }
 }
 
