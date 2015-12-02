@@ -42,6 +42,9 @@ typedef enum{
     STATUS_CODE_MAX = -0xBB8
 }e_AppStatusCodes;
 
+#define QUERY_REQUEST 0xDEADBEEF
+#define ADD_REQUEST   0xDEADD00D
+
 //****************************************************************************
 //
 //! \brief Opening a TCP server side socket and receiving data
@@ -145,12 +148,22 @@ int InitTcpServer(unsigned short port)
 }
 
 void TakeAndSendPicture(int sockID) {
-    int             picSize;
     UINT8* 			picData;
     int             numBytes;
     int				numBytesTotal = 0;
 
-	picSize = StartCamera((char **)&picData);
+    int flag = QUERY_REQUEST;
+
+	// Send flag for facial query
+	numBytes = sl_Send(sockID, (void*)&flag, sizeof(int), 0);
+	if( numBytes < 0 ) {
+		sl_Close(sockID);
+		LOOP_FOREVER();
+	}
+
+	// Requires small delay between sequential sends
+	int picSize = StartCamera((char **)&picData);
+	//MAP_UtilsDelay(100000);
 
 	// Send picSize
 	numBytes = sl_Send(sockID, (void*)&picSize, sizeof(int), 0);
