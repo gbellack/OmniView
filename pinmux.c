@@ -59,6 +59,8 @@ void PinMuxConfig(void)
 
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
 
+    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA3, PRCM_RUN_MODE_CLK);
+
     MAP_PRCMPeripheralClkEnable(PRCM_CAMERA, PRCM_RUN_MODE_CLK);
 
     MAP_PRCMPeripheralClkEnable(PRCM_I2CA0, PRCM_RUN_MODE_CLK);
@@ -80,13 +82,9 @@ void PinMuxConfig(void)
     //is a dummy value, apparently the second arg has no meaning
 	MAP_PinTypeADC(PIN_57,PIN_MODE_255);
 
-	/* DISPLAY */
-    MAP_PinTypeGPIO(PIN_64 , PIN_MODE_0, false);
-    GPIODirModeSet(GPIOA1_BASE, 0X02 ,GPIO_DIR_MODE_OUT);
-
 	/* DISPLAY RESET*/
-    //MAP_PinTypeGPIO(PIN_19 , PIN_MODE_0, false);
-    //GPIODirModeSet(GPIOA3_BASE, 0x10 ,GPIO_DIR_MODE_OUT);
+    MAP_PinTypeGPIO(PIN_18, PIN_MODE_0, false);
+    GPIODirModeSet(GPIOA3_BASE, 0x10 ,GPIO_DIR_MODE_OUT);
 
 
 	/* CAMERA */

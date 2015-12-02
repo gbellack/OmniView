@@ -11,7 +11,7 @@
 
 /* PIN LAYOUT CONFIGURATIONS */
 
-#define DISPLAY_RESET_PIN 	0x02 /*gpio 9 for display reset */
+#define DISPLAY_RESET_PIN 	0x10 /*gpio 28 for display reset */
 
 /* OLED CONFIGURATIONS */
 
