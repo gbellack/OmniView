@@ -28,8 +28,7 @@
 #include "rom.h"
 #include "../display/display.h"
 
-uint8_t toggleFaceRecognitionMode = 0; /* Toggle mode between face and speech recognition */
-
+extern int queryMode; // Global to toggle between face recognition and add mode
 volatile uint8_t count = 0;
 
 /* EFFECTS: Toggles the mode based on button press */
@@ -59,21 +58,10 @@ static void ButtonPressIntHandler(void)
     ClearDisplay();
     DisplayPrintLine("Button Pressed");
     Display();
-    MAP_UtilsDelay(1000000);
+    MAP_UtilsDelay(10000000);
 
-/*
-	// OmniView Modes
-	if (toggleFaceRecognitionMode)
-	{
-//		task1();
-		toggleFaceRecognitionMode = 0;
-	}
-	else // Speech recognition mode
-	{
-//		task2();
-		toggleFaceRecognitionMode = 1;
-	}
-*/
+    // Make next main cycle send ADD_REQUEST
+    queryMode = 0;
 
 	/* Enable GPIO Interrupt */
 	MAP_GPIOIntClear(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);

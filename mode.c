@@ -36,13 +36,16 @@
 #include "utils.h"
 #include "datatypes.h"
 
-void InitializeModules() {
+#define QUERY_REQUEST 0xDEADBEEF
+#define ADD_REQUEST   0xDEADD00D
 
+void InitializeModules() {
     UDMAInit();
     PinMuxConfig();
 	I2CInit();
 
 	InitializeInterrupts();
+//	InitializeMicrophone();
 	InitializeDisplay();
 	InitCameraComponents(640, 480);
 
@@ -55,6 +58,9 @@ void InitializeModules() {
     }
 }
 
+// Global that is changed by button interrupt
+int queryMode = 1;
+
 void FaceRecognitionMode(void *pvParameters) {
 
 	InitializeModules();
@@ -65,17 +71,29 @@ void FaceRecognitionMode(void *pvParameters) {
     	int bufSize = 100; // big enough buffer
     	char stringBuf[bufSize];
     	char countString[10];
-    	int stringLen;
+    	int stringLen, flag;
 
     	// Disable Button Interrupt
         MAP_GPIOIntDisable(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
         MAP_IntDisable(INTERRUPT_BUTTON_GPIO_HW_INT);
 
-    	TakeAndSendPicture(sockID);
-    	RecieveString(sockID, stringBuf, bufSize);
+        if(queryMode || TRUE) {
+        	flag = QUERY_REQUEST;
+        	SendFlag(sockID, flag);
+        	TakeAndSendPicture(sockID);
+        }
+        else { //add mode
+        	queryMode = 1; //go back to query mode after
+        	flag = ADD_REQUEST;
+        	SendFlag(sockID, flag);
+        	TakeAndSendRecording(sockID, 1);
+        	TakeAndSendPicture(sockID);
+        }
 
-    	ClearDisplay();
-    	DisplayPrintLine(stringBuf);
+        RecieveString(sockID, stringBuf, bufSize);
+
+        ClearDisplay();
+        DisplayPrintLine(stringBuf);
 
     	stringLen = itoa(count, countString);
     	countString[stringLen] = '\0';
@@ -90,11 +108,4 @@ void FaceRecognitionMode(void *pvParameters) {
     	count++;
     	//MAP_UtilsDelay(100000);
     }
-}
-
-void NameRecordingMode(void *pvParameters) {
-
-	for (;;) {
-
-	}
 }

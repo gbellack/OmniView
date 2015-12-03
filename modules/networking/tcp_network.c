@@ -21,6 +21,9 @@
 #include "datatypes.h"
 #include "common.h"
 
+/* MIC INCLUDES */
+#include "../microphone/microphone.h"
+
 /* DISPLAY INCLUDES */
 #include "../display/display.h"
 
@@ -41,9 +44,6 @@ typedef enum{
     DEVICE_NOT_IN_P2P_MODE = DEVICE_NOT_IN_AP_MODE - 1,
     STATUS_CODE_MAX = -0xBB8
 }e_AppStatusCodes;
-
-#define QUERY_REQUEST 0xDEADBEEF
-#define ADD_REQUEST   0xDEADD00D
 
 //****************************************************************************
 //
@@ -147,51 +147,63 @@ int InitTcpServer(unsigned short port)
     return iNewSockID;
 }
 
-void TakeAndSendPicture(int sockID) {
-    UINT8* 			picData;
-    int             numBytes;
-    int				numBytesTotal = 0;
-
-    int flag = QUERY_REQUEST;
-
-	// Send flag for facial query
-	numBytes = sl_Send(sockID, (void*)&flag, sizeof(int), 0);
-	if( numBytes < 0 ) {
+void SendFlag(int sockID, int flag) {
+	int numBytes = sl_Send(sockID, (void*)&flag, sizeof(int), 0);
+	if (numBytes < 0) {
 		sl_Close(sockID);
 		LOOP_FOREVER();
 	}
+}
 
-	// Requires small delay between sequential sends
-	int picSize = StartCamera((char **)&picData);
-	//MAP_UtilsDelay(100000);
+void SendFile(int sockID, UINT8* fileData, int fileSize) {
+    int             numBytes;
+    int				numBytesTotal = 0;
 
-	// Send picSize
-	numBytes = sl_Send(sockID, (void*)&picSize, sizeof(int), 0);
-	if( numBytes < 0 ) {
-		sl_Close(sockID);
-	    LOOP_FOREVER();
-	}
+    // Send Size
+    numBytes = sl_Send(sockID, (void*)&fileSize, sizeof(int), 0);
+    if( numBytes < 0 ) {
+    	sl_Close(sockID);
+    	LOOP_FOREVER();
+    }
 
-	// Send pic
-	numBytesTotal = 0;
-	while(numBytesTotal != picSize) {
-		numBytes = sl_Send(sockID, &picData[numBytesTotal],
-				picSize-numBytesTotal, 0);
-		if( numBytes < 0 ) {
-	    	sl_Close(sockID);
-		    LOOP_FOREVER();
-	    }
-	    numBytesTotal += numBytes;
-	}
+    // Send File
+    numBytesTotal = 0;
+    while(numBytesTotal != fileSize) {
+    	numBytes = sl_Send(sockID, &fileData[numBytesTotal],
+    			fileSize-numBytesTotal, 0);
+    	if (numBytes < 0) {
+    	    sl_Close(sockID);
+    		LOOP_FOREVER();
+    	}
+    	numBytesTotal += numBytes;
+    }
+}
+
+void TakeAndSendPicture(int sockID) {
+    UINT8* picData;
+    int picSize;
+
+	picSize = StartCamera((char **)&picData);
+	SendFile(sockID, picData, picSize);
+}
+
+void TakeAndSendRecording(int sockID, int seconds) {
+    UINT8 soundData[30000];
+    int soundSize;
+
+	soundSize = GetAudio((char*)soundData, seconds);
+	SendFile(sockID, soundData, soundSize);
 }
 
 void RecieveString(int sockID, char* stringBuf, int bufSize) {
-
 	int numBytes;
 	int count = 0;
 	do {
-		if (count == 10000) {
+		if (count == 1000) {
 			break;
+		}
+		else if(count > 0) {
+			MAP_UtilsDelay(10000); //.01 seconds
 		}
 		 numBytes = sl_Recv(sockID, stringBuf, bufSize, 0);
 		 count++;

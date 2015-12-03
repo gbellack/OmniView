@@ -7,7 +7,4 @@ extern void InitializeModules();
 /* freeRTOS tasks */
 extern void FaceRecognitionMode(void *pvParameters);
 
-extern void NameRecordingMode(void *pvParameters);
-
-
 #endif

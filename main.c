@@ -35,7 +35,6 @@
 #define SPAWN_TASK_PRIORITY     9
 #define MAX_MSG_LENGTH 16
 
-/* TODO: Handle priorities */
 #define FACE_RECOGNITION_TASK_NAME "FaceRecognitionTask"
 #define FACE_RECOGNITION_TASK_STACK_SIZE 2048
 #define FACE_RECOGNITION_TASK_PRIORITY 2
@@ -90,9 +89,6 @@ int main()
 
 	osi_TaskCreate(FaceRecognitionMode, FACE_RECOGNITION_TASK_NAME, FACE_RECOGNITION_TASK_STACK_SIZE,
 					NULL, FACE_RECOGNITION_TASK_PRIORITY, NULL);
-
-//	osi_TaskCreate(NameRecordingMode, NAME_RECORDING_TASK_NAME, NAME_RECORDING_TASK_STACK_SIZE,
-//					NULL, NAME_RECORDING_TASK_PRIORITY, NULL);
 
     // Start the task scheduler
     osi_start();
