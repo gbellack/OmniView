@@ -13,12 +13,12 @@
 //The current system is set up to record 10000 samples per second.
 //this corresponds to 20000 bytes per second
 // some common values of numSeconds
-// numSeconds = 1 -> 20000 bytes
-// numSeconds = 2 -> 40000 bytes
-// numSeconds = 3 -> 60000 bytes
-uint32_t GetAudio(char * buf, uint8_t numSeconds){
+// milSec = 1000 -> 20000 bytes
+uint32_t GetAudio(char * buf, int milSec){
 
-	TimerConfigNStart(numSeconds*SAMPLE_RATE, buf);
+	uint32_t numSamples = milSec * (SAMPLE_RATE / 1000);
+	TimerConfigNStart(numSamples, buf);
+	//TimerConfigNStart(1000, buf);
 
 	while(!RecordingDone){
 	}

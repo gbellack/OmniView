@@ -58,7 +58,7 @@ static void ButtonPressIntHandler(void)
     ClearDisplay();
     DisplayPrintLine("Button Pressed");
     Display();
-    MAP_UtilsDelay(10000000);
+    //MAP_UtilsDelay(10000000);
 
     // Make next main cycle send ADD_REQUEST
     queryMode = 0;

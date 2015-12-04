@@ -10,5 +10,5 @@
 
 extern inline uint16_t GetMicSample();
 extern void InitializeMicrophone();
-extern uint32_t GetAudio(char *buf, uint8_t numSeconds);
+extern uint32_t GetAudio(char *buf, int milSec);
 #endif

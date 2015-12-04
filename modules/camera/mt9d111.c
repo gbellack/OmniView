@@ -56,7 +56,8 @@
 #define RET_OK                  0
 #define RET_ERROR               -1
 #define SENSOR_PAGE_REG         0xF0
-#define CAM_I2C_SLAVE_ADDR      ((0xBA >> 1))
+//#define CAM_I2C_SLAVE_ADDR      ((0x90 >> 1)) //small camera
+#define CAM_I2C_SLAVE_ADDR      ((0xBA >> 1)) //big camera
 
 typedef struct MT9D111RegLst
 {

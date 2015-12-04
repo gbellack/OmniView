@@ -45,7 +45,7 @@ void InitializeModules() {
 	I2CInit();
 
 	InitializeInterrupts();
-//	InitializeMicrophone();
+	InitializeMicrophone();
 	InitializeDisplay();
 	InitCameraComponents(640, 480);
 
@@ -77,16 +77,16 @@ void FaceRecognitionMode(void *pvParameters) {
         MAP_GPIOIntDisable(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
         MAP_IntDisable(INTERRUPT_BUTTON_GPIO_HW_INT);
 
-        if(queryMode || TRUE) {
+        if (queryMode) {
         	flag = QUERY_REQUEST;
-        	SendFlag(sockID, flag);
+        	SendInt(sockID, flag);
         	TakeAndSendPicture(sockID);
         }
         else { //add mode
         	queryMode = 1; //go back to query mode after
         	flag = ADD_REQUEST;
-        	SendFlag(sockID, flag);
-        	TakeAndSendRecording(sockID, 1);
+        	SendInt(sockID, flag);
+        	TakeAndSendRecording(sockID, 10000);
         	TakeAndSendPicture(sockID);
         }
 

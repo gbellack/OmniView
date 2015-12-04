@@ -147,57 +147,9 @@ int InitTcpServer(unsigned short port)
     return iNewSockID;
 }
 
-void SendFlag(int sockID, int flag) {
-	int numBytes = sl_Send(sockID, (void*)&flag, sizeof(int), 0);
-	if (numBytes < 0) {
-		sl_Close(sockID);
-		LOOP_FOREVER();
-	}
-}
-
-void SendFile(int sockID, UINT8* fileData, int fileSize) {
-    int             numBytes;
-    int				numBytesTotal = 0;
-
-    // Send Size
-    numBytes = sl_Send(sockID, (void*)&fileSize, sizeof(int), 0);
-    if( numBytes < 0 ) {
-    	sl_Close(sockID);
-    	LOOP_FOREVER();
-    }
-
-    // Send File
-    numBytesTotal = 0;
-    while(numBytesTotal != fileSize) {
-    	numBytes = sl_Send(sockID, &fileData[numBytesTotal],
-    			fileSize-numBytesTotal, 0);
-    	if (numBytes < 0) {
-    	    sl_Close(sockID);
-    		LOOP_FOREVER();
-    	}
-    	numBytesTotal += numBytes;
-    }
-}
-
-void TakeAndSendPicture(int sockID) {
-    UINT8* picData;
-    int picSize;
-
-	picSize = StartCamera((char **)&picData);
-	SendFile(sockID, picData, picSize);
-}
-
-void TakeAndSendRecording(int sockID, int seconds) {
-    UINT8 soundData[30000];
-    int soundSize;
-
-	soundSize = GetAudio((char*)soundData, seconds);
-	SendFile(sockID, soundData, soundSize);
-}
-
 void RecieveString(int sockID, char* stringBuf, int bufSize) {
 	int numBytes;
-	int count = 0;
+	volatile int count = 0;
 	do {
 		if (count == 1000) {
 			break;
@@ -210,4 +162,87 @@ void RecieveString(int sockID, char* stringBuf, int bufSize) {
 	} while(numBytes <= 0);
 
 	stringBuf[numBytes] = '\0';
+}
+
+void Delay(int count) {
+	volatile int i;
+	for (i=0; i<count; i++);
+}
+
+void WaitForAck(int sockID) {
+	int bufSize = 100; // big enough buffer
+	char tmpBuf[bufSize];
+	RecieveString(sockID, tmpBuf, bufSize);
+}
+
+void SendInt(int sockID, int num) {
+	int numBytes = sl_Send(sockID, (void*)&num, sizeof(int), 0);
+	if (numBytes < 0) {
+		ClearDisplay();
+		DisplayPrintLine("sl_Send Error");
+		Display();
+		Delay(100000);
+		return;
+		//sl_Close(sockID);
+		//LOOP_FOREVER();
+	}
+
+	//Delay(100000);
+	//WaitForAck(sockID);
+}
+
+
+void SendData(int sockID, UINT8* fileData, int fileSize) {
+    int             numBytes;
+    int				numBytesTotal = 0;
+
+    while(numBytesTotal != fileSize) {
+    	numBytes = sl_Send(sockID, &fileData[numBytesTotal],
+    			fileSize-numBytesTotal, 0);
+    	if (numBytes < 0) {
+    		ClearDisplay();
+    		DisplayPrintLine("sl_Send Error");
+    		Display();
+    		Delay(100000);
+    		return;
+    		//sl_Close(sockID);
+    		//LOOP_FOREVER();
+    	}
+    	numBytesTotal += numBytes;
+    }
+
+    //Delay(100000);
+    //WaitForAck(sockID);
+}
+
+void SendFile(int sockID, UINT8* fileData, int fileSize) {
+	SendInt(sockID, fileSize);
+	SendData(sockID, fileData, fileSize);
+}
+
+void TakeAndSendPicture(int sockID) {
+    UINT8* picData;
+    int picSize;
+
+	picSize = StartCamera((char **)&picData);
+	SendFile(sockID, picData, picSize);
+}
+
+#define DATA_SIZE_PER_MILSEC 20
+#define MAX_MILSEC_PER_LOOP 250
+#define MAX_DATA_PER_LOOP 5000 //DATA_SIZE * MAX_MILSEC
+
+// will floor milSecs to lowest multiple of MAX_MILSEC_PER_LOOP
+void TakeAndSendRecording(int sockID, int milSec) {
+	int loopCount = milSec / MAX_MILSEC_PER_LOOP;
+	int soundSize = MAX_MILSEC_PER_LOOP * DATA_SIZE_PER_MILSEC;
+	UINT8 soundData[MAX_DATA_PER_LOOP];
+
+	SendInt(sockID, loopCount * soundSize);
+
+	int i;
+	for (i=0; i<loopCount; i++) {
+		soundSize = GetAudio((char*)soundData, MAX_MILSEC_PER_LOOP);
+		SendData(sockID, soundData, soundSize);
+	}
 }
