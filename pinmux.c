@@ -87,6 +87,10 @@ void PinMuxConfig(void)
     GPIODirModeSet(GPIOA3_BASE, 0x10 ,GPIO_DIR_MODE_OUT);
 
 
+    //CAMERA RESET
+    MAP_PinTypeGPIO(PIN_64, PIN_MODE_0, false);
+    GPIODirModeSet(GPIOA1_BASE, 0x2 ,GPIO_DIR_MODE_OUT);
+
 	/* CAMERA */
 
 	//

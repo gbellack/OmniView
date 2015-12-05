@@ -371,6 +371,7 @@ void InitializeDisplay() {
 		// bring out of reset
 		GPIOPinWrite(GPIOA3_BASE, DISPLAY_RESET_PIN, 0xFF);
 
+		MAP_UtilsDelay(MILS_DELAY(10));
 	//#endif
 
 	/* Init sequence for 128x64 OLED module */

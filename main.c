@@ -64,7 +64,6 @@ static void InitializeBoard()
 int main()
 {
     InitializeBoard();
-
     // Creating a queue for 10 elements.
 	OsiReturnVal_e osi_retVal;
     osi_retVal = osi_MsgQCreate(&MsgQ, "MSGQ", MAX_MSG_LENGTH, 10);
