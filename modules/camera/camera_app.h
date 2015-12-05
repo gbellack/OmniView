@@ -108,6 +108,7 @@ typedef struct cmd_struct{
 //******************************************************************************
 
 void InitCameraComponents(int width, int height);
+void CamControllerInit();
 unsigned short StartCamera(char **WriteBuffer);
 long SetCameraResolution(int width, int height);
 

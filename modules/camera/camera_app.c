@@ -245,7 +245,7 @@ typedef enum pictureResolution {
 /****************************************************************************/
 /*                      LOCAL FUNCTION PROTOTYPES                           */
 /****************************************************************************/
-static void CamControllerInit();
+//void CamControllerInit();
 static void CameraIntHandler();
 static unsigned short CaptureImage(char **WriteBuffer);
 static void DMAConfig();
@@ -306,7 +306,7 @@ void InitCameraComponents(int width, int height)
     //
     // Initialize camera controller
     //
-    CamControllerInit();
+//    CamControllerInit();
     //
     // Initialize camera sensor
     //
@@ -455,8 +455,7 @@ static void DMAConfig()
 //
 //*****************************************************************************
 
-static void CamControllerInit()
-{
+void CamControllerInit() {
     MAP_PRCMPeripheralClkEnable(PRCM_CAMERA, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralReset(PRCM_CAMERA);
 

@@ -46,6 +46,7 @@ void InitializeModules() {
 
 	InitializeInterrupts();
 	InitializeMicrophone();
+	CamControllerInit(); //needs to be done before InitializeDisplay()
 	InitializeDisplay();
 	InitCameraComponents(640, 480);
 
@@ -58,6 +59,7 @@ void InitializeModules() {
     }
 }
 
+#define DEBUG 1
 // Global that is changed by button interrupt
 int queryMode = 1;
 
@@ -67,39 +69,48 @@ void FaceRecognitionMode(void *pvParameters) {
 	int sockID = InitTcpServer(5001);
 
 	short count = 0;
+	int bufSize = 100; // big enough buffer
+	char crntDisplay[bufSize];
     while(1) {
-    	int bufSize = 100; // big enough buffer
     	char stringBuf[bufSize];
     	char countString[10];
-    	int stringLen, flag;
+    	int stringLen;
 
     	// Disable Button Interrupt
         MAP_GPIOIntDisable(INTERRUPT_BUTTON_BASE_ADDR, INTERRUPT_BUTTON_GPIO_PIN);
         MAP_IntDisable(INTERRUPT_BUTTON_GPIO_HW_INT);
 
         if (queryMode) {
-        	flag = QUERY_REQUEST;
-        	SendInt(sockID, flag);
+        	SendInt(sockID, QUERY_REQUEST);
         	TakeAndSendPicture(sockID);
         }
         else { //add mode
-        	queryMode = 1; //go back to query mode after
-        	flag = ADD_REQUEST;
-        	SendInt(sockID, flag);
+        	SendInt(sockID, ADD_REQUEST);
         	TakeAndSendRecording(sockID, 10000);
         	TakeAndSendPicture(sockID);
         }
 
         RecieveString(sockID, stringBuf, bufSize);
 
-        ClearDisplay();
-        DisplayPrintLine(stringBuf);
 
-    	stringLen = itoa(count, countString);
-    	countString[stringLen] = '\0';
+        if(DEBUG || strcmp(crntDisplay, stringBuf) != 0) {
+        	strcpy(crntDisplay, stringBuf);
+        	ClearDisplay();
+        	DisplayPrintLine(stringBuf);
 
-    	DisplayPrintLine(countString);
-    	Display();
+        	if(DEBUG) {
+        		stringLen = itoa(count, countString);
+        		countString[stringLen] = '\0';
+        		DisplayPrintLine(countString);
+        	}
+
+        	Display();
+        }
+
+    	if(!queryMode) {
+    		queryMode = 1; //go back to query mode after this iteration
+    		MAP_UtilsDelay(1000000); //delay for effect
+    	}
 
     	// Enable Button Interrupt
     	MAP_IntEnable(INTERRUPT_BUTTON_GPIO_HW_INT);

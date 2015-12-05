@@ -356,6 +356,7 @@ void InitializeDisplay() {
 	//#ifdef RESET_I2C_DISPLAY_PIN
 
 		/* Set RESET PIN to high for GPIO output. */
+    	GPIOPinWrite(GPIOA1_BASE, 0x02, 0xFF);
 		GPIOPinWrite(GPIOA3_BASE, DISPLAY_RESET_PIN, 0xFF);
 
 		// TODO - Figure out delays (might need freeRTOS implementation here)...
@@ -364,12 +365,15 @@ void InitializeDisplay() {
 
 		/* Bring reset low */
 		GPIOPinWrite(GPIOA3_BASE, DISPLAY_RESET_PIN, 0);
+		GPIOPinWrite(GPIOA1_BASE, 0x02, 0x00);
 
 		// wait 10ms
         MAP_UtilsDelay(MILS_DELAY(10));
 
 		// bring out of reset
+        GPIOPinWrite(GPIOA1_BASE, 0x02, 0xFF);
 		GPIOPinWrite(GPIOA3_BASE, DISPLAY_RESET_PIN, 0xFF);
+
 
 	//#endif
 
