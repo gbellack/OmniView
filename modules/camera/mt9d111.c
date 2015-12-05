@@ -149,13 +149,15 @@ static  const s_RegList preview_cmds_list[]= {
 };
 #else 
 static  const s_RegList capture_cmds_list[]= {
-    {0, 0x65, 0xA000    },  // Disable PLL
+	/*
+	{0, 0x65, 0xA000    },  // Disable PLL
     {0, 0x65, 0xE000    },  // Power DOWN PLL
     {100, 0x00, 0x01F4  },  // Delay =500ms
     {0,  0x66,  0x500B  },
     {0,  0x67,  0x0500  },
     {0, 0x65,   0xA000  },  // Disable PLL
     {0,  0x65,  0x2000  },  // Enable PLL
+    */
     {0, 0x20, 0x0000    },  // READ_MODE_B (Image flip settings)
     {100, 0x00, 0x01F4  },  // Delay =500ms
     {100, 0x00, 0x01F4  },  // Delay =500ms
