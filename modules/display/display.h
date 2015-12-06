@@ -83,6 +83,7 @@
 extern void DisplayName(const char *firstName, const char *lastName);
 
 /* Printing functions */
+extern void ClearPrintDisplayLine(const char* str);
 extern void DisplayPrint(const char *str);
 extern void DisplayPrintLine(const char *str);
 extern void PrintHelper(uint8_t c);

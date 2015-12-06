@@ -37,7 +37,6 @@
 
 #define FACE_RECOGNITION_TASK_NAME "FaceRecognitionTask"
 #define FACE_RECOGNITION_TASK_STACK_SIZE 8192
-//#define FACE_RECOGNITION_TASK_STACK_SIZE 2048
 #define FACE_RECOGNITION_TASK_PRIORITY 2
 
 /* Prototypes */
@@ -64,19 +63,9 @@ static void InitializeBoard()
 int main()
 {
     InitializeBoard();
-    // Creating a queue for 10 elements.
-	OsiReturnVal_e osi_retVal;
-    osi_retVal = osi_MsgQCreate(&MsgQ, "MSGQ", MAX_MSG_LENGTH, 10);
-    if(osi_retVal != OSI_OK)
-    {
-    	// Queue was not created and must not be used.
-    	while(1);
-    }
-
-	long lRetVal = -1;
 
 	// Start the SimpleLink Host
-	lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
+	long lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
 	if(lRetVal < 0)
 	{
 		ERR_PRINT(lRetVal);

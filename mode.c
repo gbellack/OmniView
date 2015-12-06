@@ -40,35 +40,39 @@
 #define ADD_REQUEST   0xDEADD00D
 #define MILS_DELAY(x) (80000*x/6)
 
+//GLOBALS
+const int DEBUG = 1;
+int queryMode = 1; // Global that is changed by button interrupt
+const int CAM_I2C_SLAVE_ADDR = 0x90 >> 1;  //small camera
+//const int CAM_I2C_SLAVE_ADDR = 0xBA >> 1;  //big camera
+
 void InitializeModules() {
     UDMAInit();
     PinMuxConfig();
+
     //for the PCB WITH the display soldered on, gpio9 is the camera standby line
     //for the PCB WITHOUT the display soldered on, gpio9 is the camera reset line
-    GPIOPinWrite(GPIOA1_BASE, 0x02, 0x00);
-	I2CInit();
+    GPIOPinWrite(GPIOA1_BASE, 0x02, 0x00); // comment out this line if using pcb without display soldered on
 
+    I2CInit();
 
-	//
 	// Initialize camera controller, gets the processor stuff going
-	//
 	CamControllerInit();
 
 	InitializeInterrupts();
 	InitializeMicrophone();
 	InitializeDisplay();
-	ClearDisplay();
-	DisplayPrintLine("display initialized");
-	Display();
-	MAP_UtilsDelay(1000);
-	InitCameraComponents(640, 480);
-	MAP_UtilsDelay(1000);
-	ClearDisplay();
-	DisplayPrintLine("camera initialized");
-	Display();
 
-	MAP_UtilsDelay(MILS_DELAY(5000));
-	ClearDisplay();
+	if(DEBUG) {
+		ClearPrintDisplayLine("display\n init");
+	}
+
+	InitCameraComponents(640, 480);
+
+	if(DEBUG) {
+		ClearPrintDisplayLine("camera\n init");
+	}
+
 	//Start SimpleLink in AP Mode
     long lRetVal = -1;
 	lRetVal = Network_IF_InitDriver(ROLE_AP);
@@ -78,40 +82,19 @@ void InitializeModules() {
     }
 }
 
-// Global that is changed by button interrupt
-int queryMode = 1;
-
 void FaceRecognitionMode(void *pvParameters) {
+	int sockID, stringLen, flag;
+	int count = 0;
+	char countString[10]; // big enough buffer
+	int bufSize = 100; // big enough buffer
+	char crntDisplay[bufSize];
 
 	InitializeModules();
-	int sockID;
-	int stringLen, flag;
-	sockID= InitTcpServer(5001);
 
-	ClearDisplay();
-	DisplayPrintLine("TCP connected");
-	char countString[10];
+	ClearPrintDisplayLine("ready for\n server to connect");
+	sockID = InitTcpServer(5001);
 
-	MAP_UtilsDelay(MILS_DELAY(1000));
-/*
-	int i = 0;
-
-	while(1){
-			TakeAndSendPicture(0);
-
-			DisplayPrintLine(countString);
-			Display();
-			MAP_UtilsDelay(MILS_DELAY(1000));
-			ClearDisplay();
-			MAP_UtilsDelay(MILS_DELAY(1000));
-			stringLen = itoa(i, countString);
-			countString[stringLen] = '\0';
-			i++;
-	}
-	*/
-	short count = 0;
     while(1) {
-    	int bufSize = 100; // big enough buffer
     	char stringBuf[bufSize];
 
     	// Disable Button Interrupt
@@ -133,15 +116,23 @@ void FaceRecognitionMode(void *pvParameters) {
 
         RecieveString(sockID, stringBuf, bufSize);
 
-        ClearDisplay();
-        DisplayPrintLine(stringBuf);
+        if(DEBUG || strcmp(crntDisplay, stringBuf) != 0) {
+        	strcpy(crntDisplay, stringBuf);
+        	ClearDisplay();
+        	DisplayPrintLine(stringBuf);
 
-    	stringLen = itoa(count, countString);
-    	countString[stringLen] = '\0';
+        	if(DEBUG) {
+        		stringLen = itoa(count, countString);
+        		countString[stringLen] = '\0';
+        		DisplayPrintLine(countString);
+        	}
+        	Display();
+        }
 
-    	DisplayPrintLine(countString);
-    	Display();
-
+    	if(!queryMode) {
+    		queryMode = 1; //go back to query mode after this iteration
+    		MAP_UtilsDelay(1000000); //delay for effect
+    	}
 
     	// Enable Button Interrupt
     	MAP_IntEnable(INTERRUPT_BUTTON_GPIO_HW_INT);

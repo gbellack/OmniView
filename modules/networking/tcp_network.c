@@ -45,6 +45,8 @@ typedef enum{
     STATUS_CODE_MAX = -0xBB8
 }e_AppStatusCodes;
 
+extern int DEBUG;
+
 //****************************************************************************
 //
 //! \brief Opening a TCP server side socket and receiving data
@@ -178,17 +180,12 @@ void WaitForAck(int sockID) {
 void SendInt(int sockID, int num) {
 	int numBytes = sl_Send(sockID, (void*)&num, sizeof(int), 0);
 	if (numBytes < 0) {
-		ClearDisplay();
-		DisplayPrintLine("sl_Send Error");
-		Display();
-		Delay(100000);
+		if(DEBUG) {
+			ClearPrintDisplayLine("sl_Send Error");
+			Delay(100000);
+		}
 		return;
-		//sl_Close(sockID);
-		//LOOP_FOREVER();
 	}
-
-	//Delay(100000);
-	//WaitForAck(sockID);
 }
 
 
@@ -200,19 +197,14 @@ void SendData(int sockID, UINT8* fileData, int fileSize) {
     	numBytes = sl_Send(sockID, &fileData[numBytesTotal],
     			fileSize-numBytesTotal, 0);
     	if (numBytes < 0) {
-    		ClearDisplay();
-    		DisplayPrintLine("sl_Send Error");
-    		Display();
-    		Delay(100000);
+    		if(DEBUG) {
+    			ClearPrintDisplayLine("sl_Send Error");
+    			Delay(100000);
+    		}
     		return;
-    		//sl_Close(sockID);
-    		//LOOP_FOREVER();
     	}
     	numBytesTotal += numBytes;
     }
-
-    //Delay(100000);
-    //WaitForAck(sockID);
 }
 
 void SendFile(int sockID, UINT8* fileData, int fileSize) {

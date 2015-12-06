@@ -343,8 +343,8 @@ void SetTextWrap(uint8_t w) {
 /* EFFECTS: Initializes the I2C pins and set up the display configurations. */
 void InitializeDisplay() {
 
-    /* CC3200 - I2C Init to fast mode */
-    I2C_IF_Open(I2C_MASTER_MODE_FST);
+    // DO NOT INIT I2C TO FAST, keep slow
+    //I2C_IF_Open(I2C_MASTER_MODE_FST);
 
     rotation  = 0;
     cursor_y = cursor_x = 0;
@@ -553,4 +553,10 @@ void DrawPixel(int16_t x, int16_t y, uint16_t color) {
 			buffer[x+ (y/8)*SSD1306_LCDWIDTH] ^=  (1 << (y & 7));
 			break;
 	}
+}
+
+void ClearPrintDisplayLine(const char* str) {
+	ClearDisplay();
+	DisplayPrintLine(str);
+	Display();
 }
