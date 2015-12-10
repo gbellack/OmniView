@@ -81,7 +81,7 @@ void PrintHelper(uint8_t c) {
 
 void IncrementLine() {
 	cursor_y += textsize*8;
-	cursor_x = 4 * textsize * 6; /* Offset by 4 characters */
+	cursor_x = 5 * textsize * 6; /* Offset by 4 characters */
 }
 
 void FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
