@@ -73,7 +73,7 @@ void PrintHelper(uint8_t c) {
 
 		cursor_x += textsize * 6;
 
-		if (wrap && (cursor_x > ((SSD1306_LCDWIDTH / 2) - textsize * 6))) {
+		if (wrap && (cursor_x > ((SSD1306_LCDWIDTH / 2) + 4 * textsize * 6))) {
 			IncrementLine();
 		}
 	}
@@ -81,7 +81,7 @@ void PrintHelper(uint8_t c) {
 
 void IncrementLine() {
 	cursor_y += textsize*8;
-	cursor_x = 0;
+	cursor_x = 4 * textsize * 6; /* Offset by 4 characters */
 }
 
 void FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
@@ -447,7 +447,7 @@ void ClearDisplay() {
 	Send(0x0700); // Page end address
 
 	/* Set the cursor back to the original position */
-	SetCursor(0, SSD1306_LCDHEIGHT/2);// - textsize*8);
+	SetCursor(5 * textsize * 6, SSD1306_LCDHEIGHT/2 + textsize*8);// - textsize*8);
 }
 
 /* EFFECTS: Displays whatever that is stored in buffer */
