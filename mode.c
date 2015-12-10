@@ -42,9 +42,10 @@
 
 //GLOBALS
 const int DEBUG = 1;
+int TCP_ERR_COUNT = 0;
 int queryMode = 1; // Global that is changed by button interrupt
-const int CAM_I2C_SLAVE_ADDR = 0x90 >> 1;  //small camera
-//const int CAM_I2C_SLAVE_ADDR = 0xBA >> 1;  //big camera
+//const int CAM_I2C_SLAVE_ADDR = 0x90 >> 1;  //small camera
+const int CAM_I2C_SLAVE_ADDR = 0xBA >> 1;  //big camera
 
 void InitializeModules() {
     UDMAInit();
@@ -64,13 +65,13 @@ void InitializeModules() {
 	InitializeDisplay();
 
 	if(DEBUG) {
-		ClearPrintDisplayLine("display\n init");
+		ClearPrintDisplayLine("display init");
 	}
 
 	InitCameraComponents(640, 480);
 
 	if(DEBUG) {
-		ClearPrintDisplayLine("camera\n init");
+		ClearPrintDisplayLine("camera init");
 	}
 
 	//Start SimpleLink in AP Mode
@@ -91,7 +92,7 @@ void FaceRecognitionMode(void *pvParameters) {
 
 	InitializeModules();
 
-	ClearPrintDisplayLine("ready for\n server to connect");
+	ClearPrintDisplayLine("ready for server to connect");
 	sockID = InitTcpServer(5001);
 
     while(1) {
@@ -132,6 +133,11 @@ void FaceRecognitionMode(void *pvParameters) {
     	if(!queryMode) {
     		queryMode = 1; //go back to query mode after this iteration
     		MAP_UtilsDelay(1000000); //delay for effect
+    	}
+
+    	if(TCP_ERR_COUNT >= 10) {
+    		ClearPrintDisplayLine("ready for server to connect");
+    		sockID = InitTcpServer(5001);
     	}
 
     	// Enable Button Interrupt

@@ -46,6 +46,7 @@ typedef enum{
 }e_AppStatusCodes;
 
 extern int DEBUG;
+extern int TCP_ERR_COUNT;
 
 //****************************************************************************
 //
@@ -153,11 +154,8 @@ void RecieveString(int sockID, char* stringBuf, int bufSize) {
 	int numBytes;
 	volatile int count = 0;
 	do {
-		if (count == 1000) {
+		if (count == 10000) {
 			break;
-		}
-		else if(count > 0) {
-			MAP_UtilsDelay(10000); //.01 seconds
 		}
 		 numBytes = sl_Recv(sockID, stringBuf, bufSize, 0);
 		 count++;
@@ -182,10 +180,11 @@ void SendInt(int sockID, int num) {
 	if (numBytes < 0) {
 		if(DEBUG) {
 			ClearPrintDisplayLine("sl_Send Error");
-			Delay(100000);
 		}
+		TCP_ERR_COUNT++;
 		return;
 	}
+	TCP_ERR_COUNT = 0;
 }
 
 
@@ -199,12 +198,13 @@ void SendData(int sockID, UINT8* fileData, int fileSize) {
     	if (numBytes < 0) {
     		if(DEBUG) {
     			ClearPrintDisplayLine("sl_Send Error");
-    			Delay(100000);
     		}
+    		TCP_ERR_COUNT++;
     		return;
     	}
     	numBytesTotal += numBytes;
     }
+    TCP_ERR_COUNT = 0;
 }
 
 void SendFile(int sockID, UINT8* fileData, int fileSize) {
