@@ -15,11 +15,8 @@
 #include <arpa/inet.h>
 #include <cstdlib>
 
-void *get_in_addr(struct sockaddr *sa);
 void initSocket(int& sockfd);
 void sendString(int sockfd, std::string str);
-void recvString(int sockfd, std::string& str);
-void sendImage(int sockfd);
-void recvImage(int sockfd);
+int recvMain(int sockfd);
 
 #endif

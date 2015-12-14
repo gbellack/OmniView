@@ -140,7 +140,7 @@ first: all
 all: Makefile $(TARGET) faceRec
 
 faceRec: faceRec.o
-	$(LINK) faceRec.o tcpClient.o -g -o faceRec $(LFLAGS) $(LIBS)
+	$(LINK) faceRec.o tcpClient.o -g -o faceRec $(LFLAGS) $(LIBS) 
 
 $(TARGET):  $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
@@ -456,7 +456,7 @@ faceRec.o: faceRec.cpp openbr/openbr_plugin.h \
 		/usr/include/qt5/QtGui/qcolor.h \
 		/usr/include/qt5/QtCore/QIODevice \
 		tcpClient.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o faceRec.o faceRec.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o faceRec.o faceRec.cpp -std=c++11
 
 tcpClient.o: tcpClient.cpp tcpClient.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o tcpClient.o tcpClient.cpp
