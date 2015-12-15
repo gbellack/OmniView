@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -14,7 +13,7 @@
 
 #define PORT "5001" // the port client will be connecting to 
 #define SERVERURL "192.168.1.1" // the tcp server url
-#define MAXDATASIZE 50000 // max number of bytes we can get at once 
+#define MAXDATASIZE 500000 // max number of bytes we can get at once 
 
 using namespace std;
 
@@ -76,80 +75,39 @@ void sendString(int sockfd, string str) {
 	}
 }
 
-void recvString(int sockfd, string& str) {
-	char buf[MAXDATASIZE];
-	int numBytes;
-
-	// Receive string
-	numBytes = recv(sockfd, buf, MAXDATASIZE-1, 0);
- 	if ( numBytes <= 0) {
-		perror("receiving string failed");
-		exit(1);
-	}
-	buf[numBytes] = '\0';
-	str = buf;
+void sendAck(int sockfd) {
+	sendString(sockfd, "ready");
 }
 
-void sendImage(int sockfd) {
-	FILE* image;
-	int numBytes, picSize;
-	int numBytesSent = 0; 
- 	char buf[MAXDATASIZE];
+int recvFile(int sockfd, char* fileName) {
 
-	image = fopen("test.jpg", "rb");
-	if (image == NULL) {
-		perror("file open failed");
-		exit(1);
-	}
-
-	// Obtain file size
-	fseek(image, 0, SEEK_END);
-	picSize = ftell(image);
-	rewind(image);
-	printf("Image size: %i\n", picSize);
-
-	// Send picSize
- 	if (send(sockfd, (void*)&picSize, sizeof(int), 0) <= 0) {
-		perror("sending picSize failed");
-		exit(1);
-	}
-	
-	// Read pic in file into buffer
-	numBytes = fread(buf, 1, picSize, image);
-	if (numBytes != picSize) {
-		perror("file read failed");
-		exit(1);
-	}
-		
-	// Send pic
-	while (numBytesSent != picSize) {
-		numBytes = send(sockfd, &buf[numBytesSent], picSize-numBytesSent, 0);
-		numBytesSent += numBytes;
-	}
-
-	fclose(image);
-}
-
-void recvImage(int sockfd) {
-
-	// REMOVE LATER
 	int last = 0;
-	FILE* image;
-	int numBytes, picSize;
+	FILE* file;
+	int numBytes, fileSize;
 	int numBytesRecv = 0;
 	char buf[MAXDATASIZE];
 
-	// Read in the size of the image
-	if ((numBytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-		perror("recv");
-		exit(1);
+	// Read in the size of the File
+	do {
+		numBytes = recv(sockfd, buf, MAXDATASIZE-1, 0);
+		if (numBytes == -1) {
+			perror("recv");
+			return -1;
+		}
+	} while (numBytes == 0);
+
+	fileSize = *(int*)buf;
+	fprintf(stderr, "File size: %i\n", fileSize);
+
+	if (fileSize < 0 || fileSize > MAXDATASIZE) {
+		fprintf(stderr, "corrupted fileSize\n");
+		//usleep(500000);
+		return -1;
 	}
 
-	picSize = *(int*)buf;
-	printf("Image size: %i\n", picSize);
+	//sendAck(sockfd);
 
-	while(numBytesRecv != picSize) {
-
+	while(numBytesRecv < fileSize) {
 		if ((numBytes = recv(sockfd, &buf[numBytesRecv],
 				MAXDATASIZE-numBytesRecv, 0)) == -1) {
 			perror("recv");
@@ -157,24 +115,72 @@ void recvImage(int sockfd) {
 		}
 		last = numBytesRecv;
 		numBytesRecv += numBytes;
-		
-		//if (last != numBytesRecv) {
-			printf("numBytesRecv: %i\n", numBytesRecv);
-		//}
-		
+		if (last != numBytesRecv) {
+			fprintf(stderr, "numBytesRecv: %i\n", numBytesRecv);
+		}
 	}
 
-	image = fopen("query.jpg", "wb");
-	if (image == NULL) {
+	if (numBytesRecv > fileSize) {
+		fprintf(stderr, "corrupted file\n");
+		//usleep(500000);
+		return -1;
+	}
+
+	file = fopen(fileName, "wb");
+	if (file == NULL) {
 		perror("file open failed");
 		exit(1);
 	}
 
-	fwrite(buf, 1, picSize, image);
+	fwrite(buf, 1, fileSize, file);
 
-	fclose(image);
+	fclose(file);
+	//sendAck(sockfd);
+	return 0;
 }
 
+#define QUERY_REQUEST 	0xDEADBEEF
+#define ADD_REQUEST 	0xDEADD00D
+
+int recvMain(int sockfd) {
+	int numBytes, flag;
+	char buf[MAXDATASIZE];
+
+	// Read in type of data coming in
+	do {
+		//zero out start of buf
+		for(int i=0; i<sizeof(int); i++) {
+			buf[i] = 0;
+		}
+		numBytes = recv(sockfd, buf, MAXDATASIZE-1, 0);
+		if (numBytes == -1) {
+			perror("recv");
+			return -1;
+		}
+		flag = *(int*)buf;
+		fprintf(stderr, "Incoming flag is: %#10x\n", flag);
+	} while (numBytes == 0 || (flag != QUERY_REQUEST && flag != ADD_REQUEST));
+
+	// Query request
+	if (flag == QUERY_REQUEST) {
+		if (recvFile(sockfd, "query.jpg") == -1) {
+			return -1;
+		}
+		return 1;
+	}
+	// Database add request
+	else if (flag == ADD_REQUEST) {
+
+		if (recvFile(sockfd, "sound.raw") == -1) {
+			return -1;
+		}
+		if (recvFile(sockfd, "add.jpg") == -1) {
+			return -1;
+		}
+
+		return 2;
+	}
+}
 /*
 int main(int argc, char *argv[]) {
 	int sockfd; 
@@ -183,12 +189,6 @@ int main(int argc, char *argv[]) {
 
 	for(int i=0; ; i++) {
 		string str;
-
-		recvImage(sockfd);
-		printf("Got picture\n");
-
-		// Simulate delay for facial software
-		//usleep(1000000);
 
 		if (i%3 == 0) {
 			str = "Garrison Bellack";
@@ -199,22 +199,27 @@ int main(int argc, char *argv[]) {
 		else {
 			str = "Could Not Identify Face";
 		}
+
+		if (recvMain(sockfd) > 0) {
+			fprintf(stderr, "Got file(s)\n");
+		}
+		else {
+			str = "ERROR";
+		}
+
+		// Simulate a dropped packet server->omniview
+		//if (i == 100) {
+		//	continue;
+		//}
+
+		// Simulate delay for facial software
+		//usleep(100000);
+
+		
 		sendString(sockfd, str);
-		printf("Sent name\n");
-		printf("Cycle count: %i\n", i);
+		fprintf(stderr, "Sent name\n");
+		fprintf(stderr, "Cycle count: %i\n", i);
 	}
 	return 0;
 }
 */
-/*
-	sendImage(sockfd);
-	recvImage(sockfd);
-
-	string str = "Hello World!\n";
-	sendString(sockfd, str);
-	recvString(sockfd, str);
-	printf("String: %s", str.c_str());
-
- 	close(sockfd);
-*/
- 

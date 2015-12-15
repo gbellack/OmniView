@@ -14,24 +14,136 @@
 #include <math.h>
 #include <boost/timer.hpp>
 #include <time.h>
+#include <deque>
+#include <unordered_map>
 
 #include <tcpClient.h>
 
 #define LOWER_BOUND 0.5
 #define max_size 100
+#define buffer 1
 using namespace std;
 using namespace br;
 
 
-/******************* TO DO******************
+/*************************************
 
-1) Adds name of people it does not recognize
+                  _,.--''''''  -    ''`-...__
+             /''___...---    -   ---..    `.._
+           .,--'              `-  __  `-.     .
+         .'/     ___..--------  -   ''---'-.   `.
+         /J  ,-''         __,.   -   .._  `-'-. `\
+       ,//  |     _..--'''    _         '-._|  `  \
+      / |  ,'  ,-'      _..--'    -  _____ `\|  '  `.
+    ,'  /    ,'  ,  ,.-'   _.-            '-'|    | \
+    '  / .','   / ,-    _,'  :  :      -.    '.|  |  \
+      |  /'    //'    /'   . /  | \  \   \    \+   |  |
+      | //   .'/     |     |.'  | |   |  '.    +\  |  \
+      ||/    J|      /    / |   | '.  '.  |    '.\ \   \
+      |||   | |     |   ,'  |   |  \   \   |   || ||   |
+      ||    J J    ,'   |  /_   |  |   |  ,|    |   |  |
+      ||   | |    .'|. .||/'|   | / |  + |\'     |  |  |
+      ||   | |  . | \ ./ |,'|/'|'/\  _'|,'| /  / |  |  L
+      ||   | | |'.| |'--..._`  | /| ,' |'_,.. -  || |   |
+      /L   | / | \|,.....  -'\ |/ |/  . .....    |\ |  .'
+      | |  | | |   `._(  )\           /(  )_.'   |  |  /
+     | .\  J | \      '''''           '````     /'   .|
+     |  | |  |  |                              .|  ,.'|
+     |  |.'. | _\.                             /  / | |
+     || || |  \'\:                            /   | / |
+      +L||-\...__ -._                        / /  | | |
+    | '||.+ \ _  '`-.:._     _     _        /'|   J|  J
+    |  \\ +` \ -.     `       `...'        ,' |  | | |
+    |  || |.  .         _ _               /'  |  | | |
+    |  '.  |   \          \''------;'   ,'.'  |  | | |
+     |  || |\   `._        '-.._..'   ,/  |   |  / | L
+     \  ||  |\     '-.               ,|'' |   |  | | '|
+      | '.| \ `\      `             J ||  |   |  | |  |
+      \  ||  |  \       '..      ,-'  /|  |   |  | |  L.
+      '. ||  `    -.       '''`-' |   '|  |   /  | |   |
+       | | |  '-..  `.            '''-'\ ._....._| |   |
+       | | '.         `                ||_ `.     ' . |
+
+
+ ||||||||||||||||||||\
+|||||||||||||||||||\\\\
+|||/////////        \||
+||/////   _____   ___\
+||||||   / ___   /___/
+|/   ||   /_(_) |/(_)
+ | |  |          \  |
+ |                \ /
+ \__|   /      /___\
+   |   /|\________\
+   |    |\________|
+   |    |      ||  
+   |    |  ____||___
+   |    | /   __    \
+   |    \/___/__\    \
+   |   \________/\___/
+   |            |
 
 *////////////////////////////////////////
 
 string file_glob;
 int sock; 
 int mode;
+
+deque <string> string_buf;
+
+string majority(string new_val){
+    if(string_buf.size() < 4)
+        string_buf.push_front(new_val);
+
+    else{
+        string_buf.pop_back();
+        string_buf.push_front(new_val);    
+    }
+
+    //records nums
+    unordered_map<string,double> my_map;
+
+    for(int i = 0; i < string_buf.size(); i++){
+        string tmp = string_buf[i];
+
+        //no occurrence
+        auto it = my_map.find(tmp); 
+        if(it == my_map.end()){
+            my_map.insert({tmp,0});
+        }
+        else{
+            it->second++; 
+        }
+    }
+    //finds max num if No face detected is not the most
+
+    if(my_map.find("No Face Detected") != my_map.end()){
+        if(my_map.find("No Face Detected")->second == 3){
+            return "No Face Detected";
+        }
+        return new_val;
+    }
+    else{
+        int max_num = 0;
+        string max_name = "No Face Detected";
+        string sec_name = "No Face Detected";
+
+        for(auto it = my_map.begin(); it != my_map.end(); it++){
+            if(it->second > max_num){
+                max_name = it->first;
+                max_num = it->second;
+                sec_name = max_name;
+            }
+        }
+
+        if(max_name == "No Face Detected"){
+            return sec_name;
+        }
+        else
+            return max_name;
+    }
+}   
+
 
 
 
@@ -56,11 +168,28 @@ void extractName(double score, QString file_input){
         cout << "Face recognized as: " << file.substr(second+1, first-second-1) << endl;
         cout << endl;
 
-        sendString(sock,file.substr(second+1, first-second-1));
+
+        if(buffer == true){
+            string ret = majority(file.substr(second+1, first-second-1));
+            cout << "ret string: " << ret << endl;
+            sendString(sock,ret);
+        }
+        else{
+            sendString(sock,file.substr(second+1, first-second-1));
+        }
     }
     else{
-        cout << "Unable to recognize face" << endl;
-        sendString(sock,"Unable to recognize face");
+        cout << "No Face Detected" << endl;
+
+        if(buffer == true){
+            string ret = majority("No Face Detected");
+            cout << "ret string: " << ret << endl;
+            sendString(sock,ret);
+        }
+        else{
+            sendString(sock,"No Face Detected");
+        }
+        
     }
 
 }
@@ -109,15 +238,24 @@ void blackblob(const br::Template &t){
     for(double i = top_x ; i < bottom_x; i++){
         //loop through y
         for(int j = top_y; j < bottom_y; j++){
-            //cout << "loop";
-
-            //cout << "value = " << value.rgb() << endl;
             image.setPixel(i,j,value);
         }
     }
 
     image.save(fileName, 0,100); // writes image into ba in PNG format
 }
+
+/*
+///////////////////////******************MAIN*****************\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                ___           ___         __                      ___     ___
+                |||\         /|||        //\\        ====##====   |||\    |||
+                |||\\       //|||       //  \\           ||       |||\\   |||
+                ||| \\     // |||      //    \\          ||       ||| \\  |||
+                |||  \\   //  |||     //______\\         ||       |||  \\ |||
+                |||   \\ //   |||    //========\\        ||       |||   \\|||
+                |||    \v/    |||   //          \\   ====##====   |||    \|||
+                    
+*///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 int main(int argc, char *argv[]) {
@@ -131,184 +269,116 @@ int main(int argc, char *argv[]) {
     br::TemplateList target = br::TemplateList::fromGallery("training");
     br::Globals->enrollAll = false; //Enroll exactly one face per image 
     target >> *transform;
-    //cout << "Input pic name:" << endl;
-    //cin >> file_glob;
     mode = 0;
 
     //Init socket
     initSocket(sock);
 
     while(1){
-        recvImage(sock);
+        mode = recvMain(sock);
         cout << "finished receiving image" << endl;
+        string stringToSend;
+
 
         //image detection mode
-        if(mode == 0){
-            cout << "in image mode" << endl;
-            // double elapsed_time1 = t1.elapsed();
-            //cout << " diff time in seconds: " << elapsed_time1 << endl;
+        if(mode == 1){
 
-            //boost::timer t;
+            cout << "in image mode" << endl;
             //Initialize test templates
-            file_glob = "query.jpg";
+            file_glob = "outquery.jpg";
+            string command = "convert query.jpg -background black -distort ScaleRotateTranslate -90 outquery.jpg ";
+            system(command.c_str());
+
+
             br::Template query(file_glob.c_str());
             br::TemplateList queryList;
             queryList.push_back(query);
 
             cout << "before transform: " << queryList.size() << endl;
-            
-
             // Enroll target templates
             br::Globals->enrollAll = true; // Enroll 0 or more faces per image
             queryList >> *transform;
-
-
             cout << "after transform: " << queryList.size() << endl;
-
-            /*
-            //if multiple faces
-            if(queryList.size() > 1){
-                string comms = "convert query.jpg query.png"
-                system(comms.c_str());
-                file_glob = "query.png";
-                br::Template query(file_glob.c_str());
-                queryList.pop_front();
-                queryList.push_back(query);
-            }
-            */
 
             double best_score = -100;
             QString filepath;
             if( queryList.size() >= 1 ){
-
                 // Compare first face
                 QList<float> scores = distance->compare(target, queryList[0]);
                 for (int j = 0; j < scores.size(); j++) {
-                // Print an example score
-                    // printf("Images %s and %s have a match score of %.3f\n",
-                    //        qPrintable(target[j].file.name),
-                    //        qPrintable(queryList[0].file.name),
-                    //        scores[j]);
                     if(scores[j] > best_score){
                         best_score = scores[j];
                         filepath = target[j].file.name;
                     }
-
                 }
                 extractName(best_score, filepath);
             }
             else{
-                cout << "No face detected" << endl;
-                sendString(sock,"No face detected");
-            }
-
-            //double elapsed_time = t.elapsed();
-            //cout << " diff time in seconds: " << elapsed_time << endl;
-
-            int size = queryList.size();
-            //enter loop if there are multiple faces to loop through.
-            for(int z = 1; z< size; z++){
-                /*
-                //remove face that was just compared
-                if(queryList.size() > 1){
-
-                    int template_number = 0;
-                    int smallest = calcDistance(queryList[0]);
-                    //since templates contain same eyes but different face,
-                    // need to find face associated with the same pair of eyes to remove
-                    for(int i =1; i < queryList.size(); i++){
-                        int dis = calcDistance(queryList[i]);
-                        if(dis < smallest){
-                            smallest = dis;
-                            template_number = i;
-                        }
-                    }
-                    cout << "template_number: " << template_number << endl;
-                    blackblob(queryList[template_number]);
+                string ret = majority("No Face Detected");
+                cout << "ret string: " << ret << endl;
+                if(buffer == true){
+                    sendString(sock,ret);
                 }
-
-                //enroll new image with removed face
-                br::Template query(file_glob.c_str());
-                queryList.clear();
-                queryList.push_back(query);
-
-                cout << "before" << queryList.size() << endl;
-
-
-                // Enroll templates
-                br::Globals->enrollAll = false; // Enroll 0 or more faces per image
-                target >> *transform;
-                br::Globals->enrollAll = true; // Enroll exactly one face per image
-                queryList >> *transform;
-
-                cout << "after " << queryList.size() << endl;
-
-
-                // Compare templates
-                best_score = -100;
-
-                QList<float> scores = distance->compare(target, queryList[0]);
-                for (int j = 0; j < scores.size(); j++) {
-                // Print an example score
-                    printf("Images %s and %s have a match score of %.3f\n",
-                           qPrintable(target[j].file.name),
-                           qPrintable(queryList[0].file.name),
-                           scores[j]);
-                    if(scores[j] > best_score){
-                        best_score = scores[j];
-                        filepath = target[j].file.name;
-                    }
+                else{
+                    sendString(sock,"No Face Detected");
                 }
-                extractName(best_score,filepath);
-                */
             }
 
         }
         //mic/speech mode
-        else{
+        else if (mode == 2){
+            cout << "mic mode" << endl;
             FILE *fp;
             char name[max_size];
             int status;
 
             //convert raw file to wav
-            string com1 = "sox sound.raw sound.wav";
+            string com1 = "sox -r 10000 -e signed-integer -b 16 sound.raw sound.wav";
             system(com1.c_str());
 
             //calls python script to find name -> name stored into name
+            
             fp = popen("python ./wav_transcribe.py", "r");
 
             while (fgets(name, max_size, fp) != NULL)
-                //printf("%s", name);
+                //cout << "error: no return" << endl;
 
             status = pclose(fp);
-            
+            cout << "name is: " << name << endl;
+            if(name == NULL){
+                sendString(sock, "No name found");
+            }
+            else{
+                //check if person exists
+                //creates new folder for that person
+                string folder = "/home/loren/Documents/Mich/eecs473/OmniView/face_software/training/";
+                folder.append(name);
+                
+                
+                string command = "mkdir ";
+                command.append(folder);
+                system(command.c_str());
 
-            //check if person exists
-            //creates new folder for that person
-            string folder = "/home/loren/Docuements/Mich/eecs473/OmniView/face_software/training/";
-            folder.append(name);
-            
-            
-            string command = "mkdir ";
-            command.append(folder);
-            system(command.c_str());
+                //renames pic and inserts into folder
+                string rotate = "convert add.jpg -background black -distort ScaleRotateTranslate -90 outadd.jpg ";
+                system(rotate.c_str());
 
-            //receives picture
-            recvImage(sock);
+                command = "mv outadd.jpg ";
+                command.append(folder);
+                command.append("/pic");
+                command.append("0.jpg");
+                system(command.c_str());
 
-            //renames pic and inserts into folder
-            command = "mv query.jpg ";
-            command.append(folder);
-            command.append("0.jpg");
-            system(command.c_str());
-
-            //reenroll gallery
-            target = br::TemplateList::fromGallery("training");
-            br::Globals->enrollAll = false; //Enroll exactly one face per image 
-            target >> *transform;
-
+                //reenroll gallery
+                target = br::TemplateList::fromGallery("training");
+                br::Globals->enrollAll = false; //Enroll exactly one face per image 
+                target >> *transform;
+            }
         }
-
+        else{
+            cout << "in error mode" << endl; 
+            sendString(sock,"In Error Mode");
+        }
     }
     br::Context::finalize();
     return 0;
